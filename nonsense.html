@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DISASTER RESPONSE DASHBOARD</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- PATCH: ensure popup overlay spans full screen without touching your CSS file -->
+    <style>
+        .popup-overlay {
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="popup-overlay" id="popup" aria-hidden="true">
+        <div class="popup-card" role="dialog" aria-labelledby="popup-title" aria-modal="true">
+            <div class="popup-media" aria-hidden="true">
+                <div class="popup-content">
+                    <h2 id="popup-title">WELCOME TO THE DISASTER DASHBOARD</h2>
+                    <p>Real-time situational awareness. Latest incidents, resource allocation, and rescue progress — all
+                        in one place.</p>
+                    <p><small>Tip: You can dismiss this permanently for this browser session by clicking "Enter
+                            Dashboard".</small></p>
+                    <div class="d-flex gap-2">
+                        <button id="enterBtn" class="btn btn-primary">Enter</button>
+                        <button id="closeBtn" class="btn btn-outline-secondary">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="your-logo.png" alt="">
+        </div>
+        <a href="#"><i class="bi bi-map"></i> Live HeatMap / Field</a>
+        <a href="#"><i class="bi bi-cloud-sun"></i> Weather Forecast</a>
+        <a href="#"><i class="bi bi-graph-up"></i> Modern Reporting Graph</a>
+        <a href="#"><i class="bi bi-box"></i> Resource Visualization</a>
+        <a href="#"><i class="bi bi-people"></i> Family Identification Tool</a>
+        <a href="#"><i class="bi bi-play-circle"></i> Simulation</a>
+        <a href="#"><i class="bi bi-chat-dots"></i> Community</a>
+        <a href="#"><i class="bi bi-phone"></i> USER MOBILE</a>
+        <a href="#"><i class="bi bi-bricks"></i> Earthquake Prediction</a>
+        <a href="#"><i class="bi bi-tsunami"></i> Flood Prediction</a>
+        <a href="#"><i class="bi bi-wind"></i> Cyclone Prediction</a>
+
+
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light custom-navbar py-3">
+        <div class="container-fluid">
+
+            <!-- Left: Sidebar Toggle + Dashboard -->
+            <div class="d-flex align-items-center">
+                <button class="btn toggle-btn me-2" id="toggleSidebar" aria-label="Toggle sidebar"
+                    aria-controls="sidebar" aria-expanded="false">
+                    <i class="bi bi-list fs-4"></i>
+                </button>
+                <h1 class=" fw-bold mb-0 dashboard-title">DASHBOARD</h1>
+            </div>
+
+            <!-- Center: DisasterX Branding -->
+            <div class="mx-auto text-center">
+                <span class="brand-name">Disaster<span class="brand-highlight">X</span></span>
+            </div>
+
+            <!-- Right: Live Monitoring + Buttons -->
+            <div class="d-flex align-items-center gap-3 ms-auto">
+                <small class="text-muted live-text">Live &middot; Monitoring</small>
+                <a href="login.html" class="btn custom-btn-outline">Log In</a>
+                <a href="signup.html" class="btn custom-btn">Sign Up</a>
+            </div>
+
+        </div>
+    </nav>
+
+    <main class="container my-4">
+
+        <!-- Quick stats (8) -->
+        <section id="quick-stats" class="mb-4">
+            <div class="row g-3">
+                <div class="col-6 col-md-3">
+                    <div class="stat-card stat-card-1 p-3 d-flex flex-column align-items-start">
+                        <div class="d-flex align-items-center w-100 justify-content-between">
+                            <div>
+                                <div class="stat-value" data-target="128">0</div>
+                                <div class="stat-label">Active incidents</div>
+                            </div>
+                            <i class="bi bi-fire fs-3 text-danger"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="stat-card p-3 d-flex flex-column align-items-start">
+                        <div class="d-flex align-items-center w-100 justify-content-between">
+                            <div>
+                                <div class="stat-value" data-target="5234">0</div>
+                                <div class="stat-label">People assisted</div>
+                            </div>
+                            <i class="bi bi-people fs-3 text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="stat-card p-3 d-flex flex-column align-items-start">
+                        <div class="d-flex align-items-center w-100 justify-content-between">
+                            <div>
+                                <div class="stat-value" data-target="412">0</div>
+                                <div class="stat-label">Available resources</div>
+                            </div>
+                            <i class="bi bi-box-seam fs-3 text-success"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="stat-card p-3 d-flex flex-column align-items-start">
+                        <div class="d-flex align-items-center w-100 justify-content-between">
+                            <div>
+                                <div class="stat-value" data-target="92">0</div>
+                                <div class="stat-label">Rescue operations</div>
+                            </div>
+                            <i class="bi bi-flag fs-3 text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="stat-card p-3 d-flex flex-column align-items-start">
+                        <div class="d-flex align-items-center w-100 justify-content-between">
+                            <div>
+                                <div class="stat-value" data-target="43">0</div>
+                                <div class="stat-label">Casualties</div>
+                            </div>
+                            <i class="bi bi-heartbreak fs-3 text-muted"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="stat-card p-3 d-flex flex-column align-items-start">
+                        <div class="d-flex align-items-center w-100 justify-content-between">
+                            <div>
+                                <div class="stat-value" data-target="76">0</div>
+                                <div class="stat-label">NGO's</div>
+                            </div>
+                            <i class="bi bi-building fs-3 text-info"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="stat-card p-3 d-flex flex-column align-items-start">
+                        <div class="d-flex align-items-center w-100 justify-content-between">
+                            <div>
+                                <div class="stat-value" data-target="128">0</div>
+                                <div class="stat-label">Hospitals</div>
+                            </div>
+                            <i class="bi bi-hospital fs-3 text-danger"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="stat-card p-3 d-flex flex-column align-items-start">
+                        <div class="d-flex align-items-center w-100 justify-content-between">
+                            <div>
+                                <div class="stat-value" data-target="34">0</div>
+                                <div class="stat-label">Rescue teams</div>
+                            </div>
+                            <i class="bi bi-people-fill fs-3 text-success"></i>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="charts" class="mb-4">
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="card-chart p-3 h-100">
+                        <h5>Incidents over time</h5>
+                        <canvas id="incidentsChart" height="160"></canvas>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <h6>Successful vs Rescue operations</h6>
+                    <canvas id="successChart" height="180"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Real-time news -->
+        <div class="news-swiper">
+            <div class="swiper-track">
+                <!-- Slide 1 -->
+                <a href="https://example.com/floods" target="_blank" class="swiper-slide">
+                    <img src="https://via.placeholder.com/450x250?text=Floods" alt="Floods">
+                    <div class="slide-content">
+                        <h4>Floods in Riverine District — rescue ongoing</h4>
+                        <p>Teams are evacuating affected areas.</p>
+                        <small>8/10/2025, 11:10:46 PM</small>
+                    </div>
+                </a>
+                <!-- Slide 2 -->
+                <a href="https://example.com/earthquake" target="_blank" class="swiper-slide">
+                    <img src="https://via.placeholder.com/450x250?text=Earthquake" alt="Earthquake">
+                    <div class="slide-content">
+                        <h4>Earthquake tremors reported in coastal belt</h4>
+                        <p>Aftershocks continue; monitoring in progress.</p>
+                        <small>8/10/2025, 10:10:46 PM</small>
+                    </div>
+                </a>
+                <!-- Slide 3 -->
+                <a href="https://example.com/medical" target="_blank" class="swiper-slide">
+                    <img src="https://via.placeholder.com/450x250?text=Medical+Aid" alt="Medical Camps">
+                    <div class="slide-content">
+                        <h4>Temporary medical camps set up</h4>
+                        <p>Local NGOs assisting.</p>
+                        <small>8/10/2025, 9:10:46 PM</small>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Chatbot Floating Button + Chat Window -->
+<div class="chatbot-container" id="chatbot">
+    <!-- Floating Icon -->
+    <button class="chatbot-btn" id="chatbotToggle" aria-label="Open chatbot">
+        <i class="bi bi-chat-dots-fill"></i>
+    </button>
+
+    <!-- Chat Window -->
+    <div class="chatbot-window" id="chatWindow">
+        <div class="chatbot-header">
+            <span>DisasterX Assistant</span>
+            <button id="chatClose"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="chatbot-body" id="chatBody">
+            <div class="bot-message">👋 Hi! I’m here to help with disaster info. Ask me anything.</div>
+        </div>
+        <div class="chatbot-footer">
+            <input type="text" id="chatInput" placeholder="Type your message..." />
+            <button id="chatSend"><i class="bi bi-send"></i></button>
+        </div>
+    </div>
+</div>
+
+    <!-- Enhanced Footer -->
+    <footer class="footer py-5 mt-auto">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <h5>About DisasterX</h5>
+                    <p>DisasterX is a real-time disaster management dashboard that empowers communities, responders, and
+                        authorities with live updates, analytics, and resource tracking during emergencies.</p>
+                </div>
+                <div class="col-md-2">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Live HeatMap</a></li>
+                        <li><a href="#">Weather Forecast</a></li>
+                        <li><a href="#">Resource Tools</a></li>
+                        <li><a href="#">Simulation</a></li>
+                        <li><a href="#">Community</a></li>
+                        <li><a href="#">Earthquake Prediction</a></li>
+                        <li><a href="#">Flood Prediction</a></li>
+                        <li><a href="#">Cyclone Prediction</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Contact Us</h5>
+                    <p>Email: support@disasterx.org</p>
+                    <p>Phone: +1 (800) 123-4567</p>
+                    <p>Location: Innovation Hub, India</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Follow Us</h5>
+                    <div class="social-icons d-flex gap-3">
+                        <a href="#"><i class="bi bi-facebook"></i></a>
+                        <a href="#"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#"><i class="bi bi-instagram"></i></a>
+                        <a href="#"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <small class="text-muted">&copy; 2025 DisasterX. All rights reserved.</small>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <script>
+        // Grab refs
+        const popup = document.getElementById('popup');
+        const enterBtn = document.getElementById('enterBtn');
+        const closeBtn = document.getElementById('closeBtn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const toggleBtn = document.getElementById('toggleSidebar');
+
+        // Sidebar toggle
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                const isActive = sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+                toggleBtn.setAttribute('aria-expanded', String(isActive));
+            });
+        }
+
+        if (overlay) {
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                toggleBtn && toggleBtn.setAttribute('aria-expanded', 'false');
+            });
+        }
+
+        // Popup helpers
+        function hidePopup(perList = true) {
+            if (!popup) return;
+            popup.style.display = 'none';
+            popup.setAttribute('aria-hidden', 'true');
+            if (perList) sessionStorage.setItem('respondr_seen_popup', '1');
+        }
+
+        if (sessionStorage.getItem('respondr_seen_popup')) {
+            hidePopup(false);
+        }
+
+        enterBtn && enterBtn.addEventListener('click', () => hidePopup(true));
+        closeBtn && closeBtn.addEventListener('click', () => hidePopup(false));
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hidePopup(false); });
+
+        // Animated counters
+        const counters = document.querySelectorAll('.stat-value');
+        const counterObserver = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target; animateCounter(el); obs.unobserve(el);
+                }
+            });
+        }, { threshold: 0.6 });
+
+        counters.forEach(c => counterObserver.observe(c));
+
+        function animateCounter(el) {
+            const target = +el.getAttribute('data-target');
+            const duration = 1200;
+            let start = null;
+            function step(ts) {
+                if (!start) start = ts;
+                const progress = Math.min((ts - start) / duration, 1);
+                el.textContent = Math.floor(progress * target).toLocaleString();
+                if (progress < 1) requestAnimationFrame(step);
+                else el.textContent = target.toLocaleString();
+            }
+            requestAnimationFrame(step);
+        }
+
+        // Charts
+        const incidentsCtx = document.getElementById('incidentsChart')?.getContext('2d');
+        const successCtx = document.getElementById('successChart')?.getContext('2d');
+
+        // FIXED: backticks for template literal
+        const hours = Array.from({ length: 12 }).map((_, i) => `${i + 1}h`);
+        const incidentsData = Array.from({ length: 12 }).map(() => Math.floor(Math.random() * 30) + 5);
+
+        const incidentsChart = incidentsCtx ? new Chart(incidentsCtx, {
+            type: 'line',
+            data: {
+                labels: hours,
+                datasets: [{
+                    label: 'Active incidents',
+                    data: incidentsData,
+                    fill: true,
+                    tension: 0.3,
+                    borderWidth: 2,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: true } },
+                scales: { y: { beginAtZero: true } }
+            }
+        }) : null;
+
+        const successChart = successCtx ? new Chart(successCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Successful', 'Pending/Failed'],
+                datasets: [{ data: [72, 28], hoverOffset: 6 }]
+            },
+            options: { responsive: true }
+        }) : null;
+
+        // Real-time updates
+        function simulateRealtimeUpdate() {
+            document.querySelectorAll('.stat-value').forEach(el => {
+                const base = +el.getAttribute('data-target');
+                const jitter = Math.floor((Math.random() - 0.4) * Math.max(1, base * 0.05));
+                const newVal = Math.max(0, base + jitter);
+                el.setAttribute('data-target', newVal);
+                el.textContent = newVal.toLocaleString();
+            });
+
+            if (incidentsChart) {
+                const newPoint = Math.floor(Math.random() * 35) + 2;
+                incidentsChart.data.labels.push((+incidentsChart.data.labels.slice(-1)[0].replace('h', '') + 1) + 'h');
+                incidentsChart.data.datasets[0].data.push(newPoint);
+                if (incidentsChart.data.labels.length > 24) {
+                    incidentsChart.data.labels.shift();
+                    incidentsChart.data.datasets[0].data.shift();
+                }
+                incidentsChart.update();
+            }
+
+            if (successChart) {
+                const succ = Math.max(0, Math.min(100, successChart.data.datasets[0].data[0] + Math.floor((Math.random() - 0.5) * 6)));
+                successChart.data.datasets[0].data[0] = succ;
+                successChart.data.datasets[0].data[1] = 100 - succ;
+                successChart.update();
+            }
+        }
+
+        setInterval(simulateRealtimeUpdate, 8000);
+
+        // News fetching (placeholder comment retained)
+
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.stat-value').forEach(el => {
+                if (el.textContent === '0') animateCounter(el);
+            });
+        });
+
+        let index = 0;
+        const slides = document.querySelectorAll('.swiper-slide');
+        const track = document.querySelector('.swiper-track');
+        const total = slides.length;
+
+        function nextSlide() {
+            index++;
+            if (index >= total) {
+                index = 0; // loop back
+            }
+            // FIXED: backticks around translateX
+            track.style.transform = `translateX(-${index * 100}%)`;
+        }
+
+        // enhancement: pause slider on hover (adds lines; doesn’t remove anything)
+        let sliderInterval = setInterval(nextSlide, 3000); // slide every 3s
+        const swiper = document.querySelector('.news-swiper');
+        if (swiper) {
+            swiper.addEventListener('mouseenter', () => { clearInterval(sliderInterval); });
+            swiper.addEventListener('mouseleave', () => { sliderInterval = setInterval(nextSlide, 3000); });
+        }
+
+        // enhancement: keyboard navigation for slides
+        document.addEventListener('keydown', (e) => {
+            if (!['ArrowLeft', 'ArrowRight'].includes(e.key)) return;
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') {
+                index = (index - 1 + total) % total;
+                track.style.transform = `translateX(-${index * 100}%)`;
+            }
+        });
+
+        // Chatbot toggle
+const chatbotBtn = document.getElementById("chatbotToggle");
+const chatWindow = document.getElementById("chatWindow");
+const chatClose = document.getElementById("chatClose");
+const chatBody = document.getElementById("chatBody");
+const chatInput = document.getElementById("chatInput");
+const chatSend = document.getElementById("chatSend");
+
+chatbotBtn.addEventListener("click", () => {
+    chatWindow.style.display = "flex";
+    chatbotBtn.style.display = "none";
+});
+
+chatClose.addEventListener("click", () => {
+    chatWindow.style.display = "none";
+    chatbotBtn.style.display = "flex";
+});
+
+// Send message
+chatSend.addEventListener("click", sendMessage);
+chatInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendMessage();
+});
+
+function sendMessage() {
+    const msg = chatInput.value.trim();
+    if (!msg) return;
+
+    // Show user message
+    const userMsg = document.createElement("div");
+    userMsg.className = "user-message";
+    userMsg.innerText = msg;
+    chatBody.appendChild(userMsg);
+
+    // Fake bot response
+    setTimeout(() => {
+        const botMsg = document.createElement("div");
+        botMsg.className = "bot-message";
+        botMsg.innerText = "This is a demo response. (Later you can connect AI/FAQ)";
+        chatBody.appendChild(botMsg);
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }, 800);
+
+    chatInput.value = "";
+    chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+    </script>
+</body>
+
+</html>
