@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DisasterX · Cyclone Prediction</title>
+
+  <!-- Bootstrap + Icons (same as your site) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Main theme stylesheet -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Small patch to keep global popup overlay sizing (you already had this) -->
+  <style>.popup-overlay{top:0;left:0;width:100%;height:100%;}</style>
+</head>
+<body>
+
+  <!-- Sidebar (your provided markup) -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header"><img src="your-logo.png" alt=""></div>
+    <a href="#"><i class="bi bi-map"></i> Live HeatMap / Field</a>
+    <a href="weather.html"><i class="bi bi-cloud-sun"></i> Weather Forecast</a>
+    <a href="incident.html"><i class="bi bi-graph-up"></i> Incident Reporting</a>
+    <a href="#"><i class="bi bi-box"></i> Resource Visualization</a>
+    <a href="family.html"><i class="bi bi-people"></i> Family Identification Tool</a>
+    <a href="simulation.html"><i class="bi bi-play-circle"></i> Simulation</a>
+    <a href="#"><i class="bi bi-chat-dots"></i> Community</a>
+    <a href="Profile.html"><i class="bi bi-phone"></i> USER MOBILE</a>
+    <a href="earthquake.html"><i class="bi bi-bricks"></i> Earthquake Prediction</a>
+    <a href="flood.html"><i class="bi bi-tsunami"></i> Flood Prediction</a>
+    <a class="active" href="#"><i class="bi bi-wind"></i> Cyclone Prediction</a>
+  </div>
+
+  <!-- Overlay -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Navbar (your provided markup) -->
+  <nav class="navbar navbar-expand-lg navbar-light custom-navbar py-3">
+    <div class="container-fluid">
+      <div class="d-flex align-items-center">
+        <button class="btn toggle-btn me-2" id="toggleSidebar" aria-label="Toggle sidebar" aria-controls="sidebar" aria-expanded="false">
+          <i class="bi bi-list fs-4"></i>
+        </button>
+        <h1 class="fw-bold mb-0 dashboard-title">DASHBOARD</h1>
+      </div>
+
+      <div class="mx-auto text-center">
+        <span class="brand-name">Disaster<span class="brand-highlight">X</span></span>
+      </div>
+
+      <div class="d-flex align-items-center gap-3 ms-auto">
+        <small class="text-muted live-text">Live &middot; Monitoring</small>
+        <a href="login.html" class="btn custom-btn-outline">Log In</a>
+        <a href="signup.html" class="btn custom-btn">Sign Up</a>
+      </div>
+    </div>
+  </nav>
+
+<!-- ===== CYCLONE HERO ===== -->
+<section class="cyclone-hero position-relative overflow-hidden">
+  <div aria-hidden="true"></div>
+
+  <div class="container position-relative">
+    <div class="row align-items-center">
+      <!-- Copy / CTA -->
+      <div class="col-lg-7">
+        <div class="cyclone-hero-copy reveal">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-wind fs-3 text-info"></i>
+            <span class="cyclone-chip">Cyclone Forecasting (Experimental)</span>
+          </div>
+          <h1 class="cyclone-hero-title mb-3">
+            Track cyclone paths with<br>
+            <span class="brand-accent">Disaster</span>X forecasts
+          </h1>
+          <p class="cyclone-hero-sub mb-4">
+            Powered by historical IBTrACS data and sequence-based deep learning, our predictor offers short-term cyclone track estimates.<br/>
+            Built for meteorologists, responders, and vulnerable communities.
+          </p>
+          <div class="d-flex flex-wrap gap-3">
+            <a href="#cyclone-form" class="btn cyclone-cta"><i class="bi bi-compass me-2"></i>Start Forecast</a>
+            <a href="#how-it-works" class="btn cyclone-ghost"><i class="bi bi-info-circle me-2"></i>How it works</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="col-lg-5 mt-5 mt-lg-0">
+        <div class="cyclone-stats reveal">
+          <div class="cyclone-stat">
+            <i class="bi bi-robot"></i>
+            <div>
+              <div class="cyclone-stat-label">Model format</div>
+              <div class="cyclone-stat-value">LSTM → lat/lon</div>
+            </div>
+          </div>
+          <div class="cyclone-stat">
+            <i class="bi bi-cpu"></i>
+            <div>
+              <div class="cyclone-stat-label">Training (demo)</div>
+              <div class="cyclone-stat-value">Few minutes</div>
+            </div>
+          </div>
+          <div class="cyclone-stat">
+            <i class="bi bi-graph-up"></i>
+            <div>
+              <div class="cyclone-stat-label">Test MSE</div>
+              <div class="cyclone-stat-value">0.002 – 0.05</div>
+            </div>
+          </div>
+          <small class="text-muted">* Demo values for preview</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  <!-- HOW IT WORKS -->
+  <section id="how-it-works" class="cyclone-section py-5">
+    <div class="container">
+      <div class="text-center mb-4 reveal">
+        <h2 class="section-title fw-bold"><i class="bi bi-lightning-charge me-2"></i>How this predictor works</h2>
+        <p class="text-muted">Summary of the pipeline used in <code>cyclone.py</code> and what you should expect from short-term track forecasts.</p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-3">
+          <div class="info-card reveal">
+            <div class="info-icon"><i class="bi bi-database"></i></div>
+            <h5>Data — IBTrACS</h5>
+            <p class="mb-0 text-muted">Best-track records (lat/lon, wind, pressure, time). Script filters North Indian Ocean and recent years.</p>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+          <div class="info-card reveal">
+            <div class="info-icon"><i class="bi bi-calculator"></i></div>
+            <h5>Preprocess & Features</h5>
+            <p class="mb-0 text-muted">Compute speed & bearing from successive points using haversine + time diff, normalize features with MinMaxScaler.</p>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+          <div class="info-card reveal">
+            <div class="info-icon"><i class="bi bi-layers"></i></div>
+            <h5>Sequence model (LSTM)</h5>
+            <p class="mb-0 text-muted">A small LSTM stack learns short-term dynamics (predict next lat/lon from sequence of previous features).</p>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+          <div class="info-card reveal">
+            <div class="info-icon"><i class="bi bi-globe"></i></div>
+            <h5>Realtime & Plotting</h5>
+            <p class="mb-0 text-muted">Fetch current data (if available) and project next position. Visualize predicted track on a map (client demo here).</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 reveal">
+        <div class="note-card p-3">
+          <strong>Accuracy note:</strong>
+          <span class="text-muted">
+            This model is designed for short-term positional forecasts (next few observations). Real-world accuracy depends on data quality, training window, physical processes (steering flow, ocean interaction) and model capacity.
+            In practice, expect position errors to vary — tens to a few hundreds of kilometers depending on horizon and region. Use official meteorological agency forecasts for operational decisions.
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Demo Cyclone Predictor Form & Output -->
+<div class="row g-4 align-items-start justify-content-center">
+
+  <!-- Input Form -->
+  <div class="col-lg-4 reveal">
+    <div class="card p-4 form-card shadow-sm">
+      <h4 class="mb-3">Cyclone Forecast Demo</h4>
+      <p class="text-muted small mb-3">
+        Enter current location and optional parameters to see predicted cyclone track.
+      </p>
+
+      <form id="demoForm">
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Latitude</label>
+            <input id="curLat" type="number" step="0.001" class="form-control" placeholder="e.g. 13.08" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Longitude</label>
+            <input id="curLon" type="number" step="0.001" class="form-control" placeholder="e.g. 80.27" required>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-md-4">
+            <label class="form-label">Speed (km/h)</label>
+            <input id="speed" type="number" class="form-control" placeholder="30">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Bearing (°)</label>
+            <input id="bearing" type="number" class="form-control" placeholder="140">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Sequence Length</label>
+            <input id="seqLen" type="number" class="form-control" placeholder="3">
+          </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Wind (km/h)</label>
+            <input id="wind" type="number" class="form-control" placeholder="50">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Pressure (hPa)</label>
+            <input id="pres" type="number" class="form-control" placeholder="995">
+          </div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="button" class="btn custom-btn" onclick="runCycloneDemo()">
+            <i class="bi bi-rocket-takeoff me-2"></i> Predict
+          </button>
+          <button type="button" class="btn custom-btn-outline" onclick="resetCycloneDemo()">Reset</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Output Map & Prediction -->
+  <div class="col-lg-5 reveal">
+    <div class="card p-3 shadow-sm result-panel">
+      <h5 class="mb-2">Predicted Track</h5>
+      <div class="map-canvas">
+        <svg class="svg-map" width="440" height="300" style="background:#eaf2f8; border-radius:10px;">
+          <g id="tracks"></g>
+          <g id="points"></g>
+        </svg>
+      </div>
+
+      <div class="mt-3">
+        <div class="cyclone-stat">
+          <span>Latitude:</span>
+          <span id="predLat">—</span>
+        </div>
+        <div class="cyclone-stat">
+          <span>Longitude:</span>
+          <span id="predLon">—</span>
+        </div>
+        <div class="cyclone-stat">
+          <span>Confidence:</span>
+          <span id="predConf">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  <!-- PROTECT & PREPARE -->
+  <section class="cyclone-section py-5">
+    <div class="container">
+      <div class="text-center mb-4 reveal">
+        <h2 class="section-title fw-bold">Cyclone preparedness — short, clear measures</h2>
+        <p class="text-muted">Before, during, and after — quick actions you and your community should follow.</p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-4 reveal">
+          <div class="prep-card p-3">
+            <h5><i class="bi bi-house-door me-2"></i> Secure shelter</h5>
+            <p class="mb-0 text-muted">Identify sturdy shelter; avoid coastal low-lying areas; know evacuation routes and community centers.</p>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4 reveal">
+          <div class="prep-card p-3">
+            <h5><i class="bi bi-lightning-charge-fill me-2"></i> Power & supplies</h5>
+            <p class="mb-0 text-muted">Charge phones, store water & food, secure fuel safely, and keep first-aid and torch ready.</p>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4 reveal">
+          <div class="prep-card p-3">
+            <h5><i class="bi bi-telephone-forward me-2"></i> Communications</h5>
+            <p class="mb-0 text-muted">Set a family contact plan, prefer SMS if networks congest, follow official advisories only.</p>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4 reveal">
+          <div class="prep-card p-3">
+            <h5><i class="bi bi-droplet me-2"></i> Flooding risk</h5>
+            <p class="mb-0 text-muted">Move valuables to higher floors, disconnect electrical appliances if safe, avoid driving through water.</p>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4 reveal">
+          <div class="prep-card p-3">
+            <h5><i class="bi bi-people me-2"></i> Community check-ins</h5>
+            <p class="mb-0 text-muted">Help neighbors, especially elderly & disabled — coordinate transport & shelter support.</p>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4 reveal">
+          <div class="prep-card p-3">
+            <h5><i class="bi bi-exclamation-triangle me-2"></i> After the cyclone</h5>
+            <p class="mb-0 text-muted">Beware of downed lines, unstable buildings & contaminated water. Follow rescue teams' guidance.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Chatbot Floating Button + Chat Window -->
+    <div class="chatbot-container" id="chatbot">
+        <!-- Floating Icon -->
+        <button class="chatbot-btn" id="chatbotToggle" aria-label="Open chatbot">
+            <i class="bi bi-robot"></i>
+
+        </button>
+
+        <!-- Chat Window -->
+        <div class="chatbot-window" id="chatWindow">
+            <div class="chatbot-header">
+                <span>DisasterX Assistant</span>
+                <button class="chatbot-close-btn" id="chatClose">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="chatbot-body" id="chatBody">
+                <div class="bot-message">👋 Hi! I’m here to help with disaster info. Ask me anything.</div>
+            </div>
+            <div class="chatbot-footer">
+                <input type="text" id="chatInput" placeholder="Type your message..." />
+                <button id="chatSend"><i class="bi bi-send"></i></button>
+            </div>
+        </div>
+    </div>
+
+  <!-- Footer (your provided markup) -->
+  <footer class="footer py-5 mt-auto">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-md-4">
+          <h5>About DisasterX</h5>
+          <p>DisasterX is a real-time disaster management dashboard that empowers communities, responders, and authorities with live updates, analytics, and resource tracking during emergencies.</p>
+        </div>
+        <div class="col-md-2">
+          <h5>Quick Links</h5>
+          <ul class="list-unstyled">
+            <li><a href="#">Live HeatMap</a></li>
+            <li><a href="#">Weather Forecast</a></li>
+            <li><a href="#">Resource Tools</a></li>
+            <li><a href="#">Simulation</a></li>
+            <li><a href="#">Community</a></li>
+            <li><a href="#">Earthquake Prediction</a></li>
+            <li><a href="#">Flood Prediction</a></li>
+            <li><a href="#">Cyclone Prediction</a></li>
+          </ul>
+        </div>
+        <div class="col-md-3">
+          <h5>Contact Us</h5>
+          <p>Email: support@disasterx.org</p>
+          <p>Phone: +1 (800) 123-4567</p>
+          <p>Location: Innovation Hub, India</p>
+        </div>
+        <div class="col-md-3">
+          <h5>Follow Us</h5>
+          <div class="social-icons d-flex gap-3">
+            <a href="#"><i class="bi bi-facebook"></i></a>
+            <a href="#"><i class="bi bi-twitter-x"></i></a>
+            <a href="#"><i class="bi bi-instagram"></i></a>
+            <a href="#"><i class="bi bi-linkedin"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="text-center mt-4">
+        <small class="text-muted">&copy; 2025 DisasterX. All rights reserved.</small>
+      </div>
+    </div>
+  </footer>
+
+
+
+<!-- ✅ Map display (iframe updated from backend) -->
+<div class="map-canvas mt-3">
+  <iframe id="mapFrame" src="" style="width:100%;height:100%;border:none;display:none;"></iframe>
+</div>
+
+  <!-- Bootstrap bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Inline JS: sidebar, reveal, demo prediction + small map projection -->
+<script>
+  // Sidebar toggle (same pattern used elsewhere)
+  (function(){
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const toggleBtn = document.getElementById('toggleSidebar');
+    function closeSidebar(){ sidebar.classList.remove('active'); overlay.classList.remove('active'); }
+    toggleBtn.addEventListener('click', ()=>{ sidebar.classList.toggle('active'); overlay.classList.toggle('active'); });
+    overlay.addEventListener('click', closeSidebar);
+    document.addEventListener('keydown', (e)=> { if (e.key==='Escape') closeSidebar(); });
+  })();
+
+  // Reveal animations (IntersectionObserver)
+  (function(){
+    const els = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(en=>{
+        if(en.isIntersecting){ en.target.classList.add('reveal-in'); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.15 });
+    els.forEach(e=>io.observe(e));
+  })();
+
+  // Utility: degrees -> radians
+  function toRad(d){ return d * Math.PI/180; }
+  function toDeg(r){ return r * 180/Math.PI; }
+
+  // Lightweight haversine used for demo position stepping (km)
+  function haversineKm(lat1, lon1, lat2, lon2){
+    const R=6371;
+    const dLat = toRad(lat2-lat1), dLon = toRad(lon2-lon1);
+    const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+    return R * 2 * Math.asin(Math.sqrt(a));
+  }
+
+  // Move a point by distance (km) and bearing (deg) -> returns new lat/lon
+  function destLatLon(lat, lon, distKm, bearingDeg){
+    const R=6371;
+    const br = toRad(bearingDeg);
+    const φ1 = toRad(lat), λ1 = toRad(lon);
+    const δ = distKm / R;
+    const φ2 = Math.asin( Math.sin(φ1)*Math.cos(δ) + Math.cos(φ1)*Math.sin(δ)*Math.cos(br) );
+    const λ2 = λ1 + Math.atan2(Math.sin(br)*Math.sin(δ)*Math.cos(φ1), Math.cos(δ)-Math.sin(φ1)*Math.sin(φ2));
+    return [ (toDeg(φ2)), ((toDeg(λ2)+540)%360)-180 ];
+  }
+
+  // === NEW: Backend-connected city predictor ===
+  document.addEventListener("DOMContentLoaded", () => {
+    const cityInput = document.getElementById("cityInput");
+    const cityBtn = document.getElementById("cityBtn");
+
+    cityBtn.addEventListener("click", async () => {
+      const city = cityInput.value.trim();
+      if (!city) {
+        alert("Please enter a city name.");
+        return;
+      }
+
+      try {
+        const res = await fetch(`/predict/${city}`);  // ✅ leading slash
+        if (!res.ok) throw new Error("Prediction failed");
+
+        const data = await res.json();
+
+        // Update numeric fields
+        document.getElementById("predLat").textContent =
+          data.prediction.lat.toFixed(3) + "°";
+        document.getElementById("predLon").textContent =
+          data.prediction.lon.toFixed(3) + "°";
+        document.getElementById("predConf").textContent =
+          data.confidence + "%";
+
+        document.getElementById("mapLink").innerHTML =
+          `<a href="${data.map_url}" target="_blank">View on Map</a>`;
+      } catch (err) {
+        console.error(err);
+        alert("Prediction failed. Try again.");
+      }
+    });
+  });
+
+  // === Keep your existing demo predictor for manual lat/lon (unchanged) ===
+  function runCycloneDemo(){
+    const lat = parseFloat(document.getElementById('curLat').value);
+    const lon = parseFloat(document.getElementById('curLon').value);
+    if (isNaN(lat) || isNaN(lon)){ alert('Please enter valid coordinates'); return; }
+
+    const speed = parseFloat(document.getElementById('speed').value) || 30; // km/h default
+    const bearing = parseFloat(document.getElementById('bearing').value);
+    const br = (isNaN(bearing) ? 140 : bearing);
+    const seqLen = parseInt(document.getElementById('seqLen').value) || 3;
+
+    const stepHours = 6;
+    const stepDist = (speed * (stepHours/1)); // km per step
+
+    let path = [[lat, lon]];
+    for (let i=0;i<seqLen;i++){
+      const last = path[path.length-1];
+      const next = destLatLon(last[0], last[1], stepDist*(1 + i*0.12), br + i*2);
+      path.push(next);
+    }
+
+    const wind = parseFloat(document.getElementById('wind').value) || 50;
+    const pres = parseFloat(document.getElementById('pres').value) || 995;
+    let conf = 80 - Math.min(60, Math.max(0, (wind-40)*0.6 + (1010-pres)*0.3));
+    conf = Math.round(Math.max(15, Math.min(95, conf)));
+
+    const pred = path[path.length-1];
+    document.getElementById('predLat').textContent = pred[0].toFixed(3) + '°';
+    document.getElementById('predLon').textContent = pred[1].toFixed(3) + '°';
+    document.getElementById('predConf').textContent = conf + '%';
+
+    drawPathOnSVG(path);
+  }
+
+  function resetCycloneDemo(){
+    document.getElementById('cycloneForm').reset();
+    document.getElementById('predLat').textContent = '—';
+    document.getElementById('predLon').textContent = '—';
+    document.getElementById('predConf').textContent = '—';
+    drawPathOnSVG([]);
+  }
+
+  function drawPathOnSVG(path){
+    const svg = document.querySelector('.svg-map');
+    const pointsGroup = svg.querySelector('#points');
+    const tracksGroup = svg.querySelector('#tracks');
+    pointsGroup.innerHTML = '';
+    tracksGroup.innerHTML = '';
+
+    if (!path || path.length === 0) return;
+
+    const lats = path.map(p=>p[0]);
+    const lons = path.map(p=>p[1]);
+    const latMin = Math.min(...lats)-1, latMax = Math.max(...lats)+1;
+    const lonMin = Math.min(...lons)-1, lonMax = Math.max(...lons)+1;
+
+    function proj(lat, lon){
+      const vw = 440, vh = 300;
+      const x = ((lon - lonMin) / (lonMax - lonMin)) * (vw - 40) + 20;
+      const y = ((latMax - lat) / (latMax - latMin)) * (vh - 40) + 20;
+      return [x, y];
+    }
+
+    const pathPoints = path.map(p => proj(p[0], p[1]));
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+    line.setAttribute('points', pathPoints.map(pt=>pt.join(',')).join(' '));
+    line.setAttribute('fill', 'none');
+    line.setAttribute('stroke', '#ff6b6b');
+    line.setAttribute('stroke-width', '2');
+    line.setAttribute('stroke-linecap', 'round');
+    line.setAttribute('stroke-linejoin', 'round');
+    tracksGroup.appendChild(line);
+
+    pathPoints.forEach((pt, i)=>{
+      const [x,y]=pt;
+      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      circle.setAttribute('cx', x);
+      circle.setAttribute('cy', y);
+      circle.setAttribute('r', i===0 ? 5 : 6);
+      circle.setAttribute('fill', i===0 ? '#1F4E79' : (i===pathPoints.length-1 ? '#e63946' : '#ffc107'));
+      circle.setAttribute('stroke', '#fff');
+      circle.setAttribute('stroke-width', '1.5');
+      circle.style.transition = 'transform .45s ease';
+      pointsGroup.appendChild(circle);
+
+      if (i === pathPoints.length-1){
+        circle.classList.add('pulse-marker');
+      }
+    });
+  }
+
+  drawPathOnSVG([]);
+  function runCycloneDemo() {
+  const lat = parseFloat(document.getElementById('curLat').value);
+  const lon = parseFloat(document.getElementById('curLon').value);
+  if (isNaN(lat) || isNaN(lon)) { alert('Please enter valid coordinates'); return; }
+
+  const speed = parseFloat(document.getElementById('speed').value) || 30;
+  const bearing = parseFloat(document.getElementById('bearing').value) || 140;
+  const seqLen = parseInt(document.getElementById('seqLen').value) || 3;
+  const stepDist = speed * 6; // km per step
+
+  let path = [[lat, lon]];
+  for (let i = 0; i < seqLen; i++) {
+    const last = path[path.length-1];
+    path.push(destLatLon(last[0], last[1], stepDist*(1+i*0.12), bearing + i*2));
+  }
+
+  let conf = 80 - Math.min(60, Math.max(0, ((parseFloat(document.getElementById('wind').value)||50)-40)*0.6 + (1010-(parseFloat(document.getElementById('pres').value)||995))*0.3));
+  conf = Math.round(Math.max(15, Math.min(95, conf)));
+
+  const pred = path[path.length-1];
+  document.getElementById('predLat').textContent = pred[0].toFixed(3) + '°';
+  document.getElementById('predLon').textContent = pred[1].toFixed(3) + '°';
+  document.getElementById('predConf').textContent = conf + '%';
+
+  drawPathOnSVG(path);
+}
+
+function resetCycloneDemo() {
+  document.getElementById('demoForm').reset();
+  document.getElementById('predLat').textContent = '—';
+  document.getElementById('predLon').textContent = '—';
+  document.getElementById('predConf').textContent = '—';
+  drawPathOnSVG([]);
+}
+
+function drawPathOnSVG(path) {
+  const svg = document.querySelector('.svg-map');
+  const pointsGroup = svg.querySelector('#points');
+  const tracksGroup = svg.querySelector('#tracks');
+  pointsGroup.innerHTML = '';
+  tracksGroup.innerHTML = '';
+
+  if (!path.length) return;
+
+  const lats = path.map(p=>p[0]);
+  const lons = path.map(p=>p[1]);
+  const latMin = Math.min(...lats)-1, latMax = Math.max(...lats)+1;
+  const lonMin = Math.min(...lons)-1, lonMax = Math.max(...lons)+1;
+
+  const pathPoints = path.map(p => {
+    const x = ((p[1]-lonMin)/(lonMax-lonMin))* (440-40)+20;
+    const y = ((latMax-p[0])/(latMax-latMin))*(300-40)+20;
+    return [x, y];
+  });
+
+  const line = document.createElementNS('http://www.w3.org/2000/svg','polyline');
+  line.setAttribute('points', pathPoints.map(pt=>pt.join(',')).join(' '));
+  line.setAttribute('fill','none');
+  line.setAttribute('stroke','#ff6b6b');
+  line.setAttribute('stroke-width','2');
+  line.setAttribute('stroke-linecap','round');
+  line.setAttribute('stroke-linejoin','round');
+  tracksGroup.appendChild(line);
+
+  pathPoints.forEach((pt,i)=>{
+    const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('cx', pt[0]);
+    circle.setAttribute('cy', pt[1]);
+    circle.setAttribute('r', i===0?5:6);
+    circle.setAttribute('fill', i===0? '#1F4E79':(i===pathPoints.length-1?'#e63946':'#ffc107'));
+    circle.setAttribute('stroke','#fff');
+    circle.setAttribute('stroke-width','1.5');
+    circle.classList.add(i===pathPoints.length-1?'pulse-marker':'');
+    pointsGroup.appendChild(circle);
+  });
+}
+
+</script>
+
+<style>
+  /* small inline styles specific to this page (safe to include inline) */
+  .cyclone-hero { min-height: 56vh; padding: 3.2rem 0; position: relative; }
+  .cyclone-hero-bg {
+    position: absolute; inset: 0;
+    background-image: url('https://images.unsplash.com/photo-1501594907352-04cda38ebc29?q=80&w=1600&auto=format&fit=crop');
+    background-size: cover; background-position: center;
+    filter: saturate(.95) brightness(.6);
+    z-index: -1;
+  }
+  .hero-tag { background: rgba(255,255,255,0.06); color: #fff; padding: .4rem .6rem; border-radius: 999px; align-items:center; }
+  .cyclone-stats { display:grid; gap:12px; background: rgba(255,255,255,0.04); padding: 14px; border-radius:12px; color:#fff; }
+  .cyclone-stat { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px; border-radius:10px; background: rgba(0,0,0,0.14); }
+  .cyclone-stat-value { font-weight:700; font-size:1rem; }
+  .info-card { border-radius:12px; padding:18px; background:#fff; box-shadow: 0 8px 30px rgba(12,38,80,0.06); }
+  .info-icon { width:48px; height:48px; border-radius:10px; display:inline-grid; place-items:center; font-size:1.2rem; background:#E6F0FA; color:#1F4E79; margin-bottom:10px; }
+  .note-card { background:#fff7ed; color:#5a3b19; border-radius:10px; border:1px solid #ffecd1; }
+
+  .form-card { border-radius:14px; background:#ffffff; box-shadow:0 10px 30px rgba(12,38,80,0.05); }
+  .result-panel { border-radius:14px; background:#ffffff; box-shadow:0 10px 30px rgba(12,38,80,0.05); }
+  .map-canvas { height: 240px; border-radius:10px; overflow:hidden; border:1px solid rgba(12,38,80,0.05); background:#eaf2f8; display:flex; align-items:center; justify-content:center; }
+
+  .prep-card { border-radius:12px; border:1px solid rgba(12,38,80,0.05); background:#fff; padding:16px; box-shadow:0 8px 24px rgba(12,38,80,0.04); }
+  .prep-card h5 { font-weight:700; }
+
+  /* reveal animations */
+  .reveal { opacity: 0; transform: translateY(22px); }
+  .reveal-in { opacity: 1; transform: translateY(0); transition: opacity .7s ease, transform .7s ease; }
+
+  /* svg marker pulse */
+  .pulse-marker { animation: pulse 1.1s infinite ease-in-out; transform-origin:center; }
+  @keyframes pulse { 0%{ transform: scale(1); } 60%{ transform: scale(1.25); } 100%{ transform: scale(1); } }
+
+  /* small responsive tweaks */
+  @media (max-width: 992px) {
+    .cyclone-hero { padding: 2.4rem 0; }
+    .map-canvas { height: 220px; }
+  }
+</style>
+</body>
+</html>
