@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Missing People Reports</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #f8f9fa; }
+    .report-card {
+      max-width: 1100px;
+      margin: 30px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    table img { border-radius: 8px; }
+    #loadMoreBtn { margin: 20px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="report-card">
+      <h3 class="mb-4 text-center">📋 Missing People Reports</h3>
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>Reporter</th>
+              <th>Phone</th>
+              <th>Missing Person</th>
+              <th>Age</th>
+              <th>Gender</th>
+              <th>Last Seen</th>
+              <th>Status</th>
+              <th>Blood Group</th>
+              <th>Photo</th>
+              <th>Date Reported</th>
+            </tr>
+          </thead>
+          <tbody id="reportsTableBody">
+            <tr><td colspan="10" class="text-center">Loading...</td></tr>
+          </tbody>
+        </table>
+        <div class="text-center">
+          <button id="loadMoreBtn" class="btn btn-primary">Load More</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getFirestore, collection, query, orderBy, limit, startAfter, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBSz5L6YRK2DR_mkrFgnHucp6VLgNQKYX8",
+      authDomain: "public-announcement-d58d7.firebaseapp.com",
+      projectId: "public-announcement-d58d7",
+      storageBucket: "public-announcement-d58d7.firebasestorage.app",
+      messagingSenderId: "51806474422",
+      appId: "1:51806474422:web:d3b823833bbfa994ebd617",
+      measurementId: "G-2KZ43GBMNM"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const PAGE_SIZE = 100;
+    let lastVisible = null;
+    const reportsTableBody = document.getElementById("reportsTableBody");
+    const loadMoreBtn = document.getElementById("loadMoreBtn");
+
+    async function loadReports() {
+      loadMoreBtn.disabled = true;
+      let q;
+      if (lastVisible) {
+        q = query(collection(db, "familyReports"), orderBy("createdAt", "desc"), startAfter(lastVisible), limit(PAGE_SIZE));
+      } else {
+        q = query(collection(db, "familyReports"), orderBy("createdAt", "desc"), limit(PAGE_SIZE));
+        reportsTableBody.innerHTML = ""; // clear initial loading
+      }
+
+      try {
+        const snapshot = await getDocs(q);
+        if (snapshot.empty) {
+          if (!lastVisible) {
+            reportsTableBody.innerHTML = "<tr><td colspan='10' class='text-center'>No reports found</td></tr>";
+          }
+          loadMoreBtn.style.display = "none"; // hide button if no more
+          return;
+        }
+
+        lastVisible = snapshot.docs[snapshot.docs.length - 1];
+
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          let date = "N/A";
+          if (data.createdAt && data.createdAt.seconds) {
+            date = new Date(data.createdAt.seconds * 1000).toLocaleString();
+          }
+
+          reportsTableBody.innerHTML += `
+            <tr>
+              <td>${data.reporterName || "-"}</td>
+              <td>${data.reporterPhone || "-"}</td>
+              <td>${data.name || "-"}</td>
+              <td>${data.age || "-"}</td>
+              <td>${data.gender || "-"}</td>
+              <td>${data.lastSeen || "-"}</td>
+              <td><span class="badge bg-${data.status === "Missing" ? "danger" : data.status === "Found" ? "success" : "warning"}">${data.status || "-"}</span></td>
+              <td>${data.bloodGroup || "-"}</td>
+              <td>${data.photoUrl ? `<img src="${data.photoUrl}" width="60" height="60">` : "No Photo"}</td>
+              <td>${date}</td>
+            </tr>
+          `;
+        });
+
+        // Enable load more button if there might be more
+        loadMoreBtn.disabled = false;
+
+      } catch (error) {
+        console.error("Error loading reports:", error);
+        reportsTableBody.innerHTML += "<tr><td colspan='10' class='text-center text-danger'>Error loading reports</td></tr>";
+      }
+    }
+
+    loadMoreBtn.addEventListener("click", loadReports);
+
+    // Load initial page
+    loadReports();
+  </script>
+</body>
+</html>

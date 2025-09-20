@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Disaster Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Reset */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", Tahoma, sans-serif; }
+
+    body {
+      background: #f4f6f9;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    /* Header */
+    .header {
+      background: #1E272C;;
+      color: white;
+      text-align: center;
+      padding: 30px 20px;
+      border-bottom-left-radius: 25px;
+      border-bottom-right-radius: 25px;
+    }
+
+    .header h1 { font-size: 2rem; margin-bottom: 8px; }
+
+    /* Layout */
+    .main-content {
+      padding: 30px;
+      max-width: 1200px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 25px;
+    }
+
+    /* Card */
+    .card {
+      background: #fff;
+      padding: 22px;
+      border-radius: 16px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+
+    /* Profile */
+    .profile {
+      grid-row: span 3;
+      text-align: center;
+    }
+    .profile-pic {
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      border: 4px solid #e74c3c;
+      margin-bottom: 15px;
+    }
+    .subtitle { color: #777; margin-bottom: 15px; font-size: 0.95rem; }
+    .profile-info { list-style: none; margin: 15px 0; text-align: left; }
+    .profile-info li { margin-bottom: 10px; }
+    .profile-actions { margin-top: 18px; }
+    button {
+      padding: 10px 18px; margin: 5px; border: none; border-radius: 10px;
+      cursor: pointer; font-weight: bold; background: #3498db; color: white;
+    }
+    button:hover { background: #2980b9; }
+    button.danger { background: #e74c3c; }
+    button.danger:hover { background: #c0392b; }
+
+    /* Stats */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+    .stat-card {
+      background: #fff;
+      padding: 18px;
+      text-align: center;
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease;
+    }
+    .stat-card:hover { transform: translateY(-4px); }
+    .stat-card h3 { font-size: 1.4rem; margin-bottom: 6px; color: #e74c3c; }
+
+    /* Sections */
+    .activity h2, .alerts h2, .family h2 {
+      margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 6px;
+    }
+
+    /* Activity */
+    .activity-item {
+      border-left: 4px solid #3498db;
+      padding: 10px 15px; margin-bottom: 12px;
+      background: #f9fbfd; border-radius: 8px;
+    }
+    .activity-item .date { font-size: 0.85rem; color: #777; display: block; margin-bottom: 4px; }
+
+    /* Alerts */
+    .alerts ul { list-style: none; padding-left: 0; }
+    .alert {
+      display: block; padding: 12px; margin-bottom: 10px;
+      border-radius: 8px; font-weight: bold;
+    }
+    .alert.high { background: #e74c3c; color: #fff; }
+    .alert.medium { background: #f39c12; color: #fff; }
+    .alert.low { background: #27ae60; color: #fff; }
+
+    /* Family Reports Accordion */
+    .accordion-item { border: 1px solid #eee; border-radius: 8px; margin-bottom: 8px; }
+    .accordion-header { padding: 10px 15px; cursor: pointer; background: #f4f6f8; font-weight: 500; }
+    .accordion-body { padding: 12px 15px; background: #fff; display: none; }
+    .accordion-header.active + .accordion-body { display: block; }
+
+    /* Responsive */
+    @media (max-width: 1100px) { .main-content { grid-template-columns: 1fr; } .stats { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 600px) { .stats { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <h1>🛡️ Disaster Response Dashboard</h1>
+    <p>Welcome back, Rahul</p>
+  </header>
+
+  <!-- Main -->
+  <main class="main-content">
+    <!-- Profile -->
+    <section class="profile card">
+      <img src="https://via.placeholder.com/120" alt="Profile Picture" class="profile-pic">
+      <h2>Rahul Sharma</h2>
+      <p class="subtitle">Pune, India</p>
+      <ul class="profile-info">
+        <li><strong>Email:</strong> rahul@example.com</li>
+        <li><strong>Phone:</strong> +91 9123456789</li>
+        <li><strong>Status:</strong> Active Volunteer</li>
+        <li><strong>Joined:</strong> July 2024</li>
+        <li><strong>Last Login:</strong> Sept 2, 2025 - 11:00 AM</li>
+      </ul>
+      <div class="profile-actions">
+        <button>Edit Profile</button>
+        <button class="danger">Logout</button>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="stats">
+      <div class="stat-card">
+        <h3>👨‍👩‍👧‍👦 5</h3>
+        <p>Family Reports</p>
+      </div>
+      <div class="stat-card">
+        <h3>⚠️ 7</h3>
+        <p>Incidents Reported</p>
+      </div>
+      <div class="stat-card">
+        <h3>🔔 12</h3>
+        <p>Alerts Subscribed</p>
+      </div>
+      <div class="stat-card">
+        <h3>📦 4</h3>
+        <p>Resources Requested</p>
+      </div>
+    </section>
+
+    <!-- Family Reports -->
+    <section class="family card">
+      <h2>Family Members Status</h2>
+      <div class="accordion">
+        <div class="accordion-item">
+          <div class="accordion-header">Anita Sharma (Missing)</div>
+          <div class="accordion-body">
+            <p><b>Age:</b> 45</p>
+            <p><b>Gender:</b> Female</p>
+            <p><b>Last Seen:</b> Pune Railway Station</p>
+            <p><b>Blood Group:</b> O+</p>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <div class="accordion-header">Rohit Sharma (Found)</div>
+          <div class="accordion-body">
+            <p><b>Age:</b> 18</p>
+            <p><b>Gender:</b> Male</p>
+            <p><b>Last Seen:</b> Relief Camp A</p>
+            <p><b>Blood Group:</b> B+</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Activity -->
+    <section class="activity card">
+      <h2>Recent Activity</h2>
+      <div class="activity-item">
+        <span class="date">Sept 1, 2025</span>
+        <p>📢 Subscribed to flood alerts</p>
+      </div>
+      <div class="activity-item">
+        <span class="date">Aug 28, 2025</span>
+        <p>📝 Reported roadblock due to landslide</p>
+      </div>
+    </section>
+
+    <!-- Alerts -->
+    <section class="alerts card">
+      <h2>Active Alerts Near You</h2>
+      <ul>
+        <li><span class="alert high">⚠️ Flood Warning - Pune (High)</span></li>
+        <li><span class="alert medium">🌪️ Wind Advisory - Maharashtra (Medium)</span></li>
+        <li><span class="alert low">🔥 Heatwave - Western India (Low)</span></li>
+      </ul>
+    </section>
+  </main>
+
+  <script>
+    // Simple accordion toggle
+    document.querySelectorAll(".accordion-header").forEach(header => {
+      header.addEventListener("click", () => {
+        header.classList.toggle("active");
+        const body = header.nextElementSibling;
+        body.style.display = body.style.display === "block" ? "none" : "block";
+      });
+    });
+  </script>
+</body>
+</html>

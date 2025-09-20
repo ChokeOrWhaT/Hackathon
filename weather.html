@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Weather Forecast • DisasterX</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- keep your global style.css (theme) -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Page-scoped styles (unique .wx- prefix to avoid collisions) -->
+  <style>
+    /* ---------- Scoped weather page styles (wx-) ---------- */
+    .wx-wrap { max-width: 1100px; margin: 32px auto; padding: 0 16px; }
+    .wx-hero {
+      background: #f3f4f6; /* gentle gray container per your request */
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 22px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+    }
+    .wx-hero h2 { margin: 0 0 8px 0; font-weight: 700; }
+    .wx-hero p { margin: 0; color: #475569; line-height: 1.45; }
+
+    .wx-search {
+      display:flex; gap:12px; align-items:center; margin-top:18px;
+    }
+    .wx-ico {
+      width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:8px;
+      background:linear-gradient(180deg, rgba(0,0,0,0.03), rgba(0,0,0,0.01)); font-size:20px;
+    }
+
+    /* main weather card area */
+    .wx-grid { display:grid; grid-template-columns: 1fr 380px; gap:20px; margin-top:20px; }
+    @media (max-width: 940px) { .wx-grid { grid-template-columns:1fr; } }
+
+    .wx-main {
+      background: var(--card); padding:18px; border-radius:12px; box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .wx-current {
+      display:flex; gap:18px; align-items:center; padding-bottom:10px; border-bottom:1px solid var(--border);
+    }
+    .wx-current .wx-icon {
+      width:120px; height:120px; display:flex; align-items:center; justify-content:center; border-radius:12px;
+      font-size:56px; background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(99,102,241,0.03));
+      transition: transform .3s;
+    }
+    .wx-current .wx-temp { font-size:44px; font-weight:700; }
+    .wx-current .wx-meta { color: var(--text-secondary); margin-top:6px; }
+
+    /* small stat pills (wind, humidity, pressure) */
+    .wx-stats { display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; }
+    .wx-pill { padding:10px 12px; border-radius:10px; background:#fbfdff; box-shadow:0 6px 12px rgba(2,6,23,0.03); font-weight:600; color:var(--text-dark); min-width:120px; display:flex; align-items:center; gap:8px; }
+
+    /* forecast strip */
+    .wx-forecast { display:flex; gap:12px; margin-top:18px; overflow:auto; padding-bottom:8px; }
+    .wx-day { min-width:110px; background:#fff; border-radius:10px; padding:10px; text-align:center; box-shadow: 0 8px 18px rgba(2,6,23,0.04); transition: transform .25s, box-shadow .25s; }
+    .wx-day:hover { transform: translateY(-6px); box-shadow: 0 18px 30px rgba(2,6,23,0.08); }
+    .wx-day .d-date { font-weight:700; font-size:0.9rem; margin-bottom:6px; }
+    .wx-day .d-temp { font-size:1rem; font-weight:700; margin-top:8px; }
+    .wx-day img { width:48px; height:48px; display:block; margin:0 auto; }
+
+    /* side panel */
+    .wx-side {
+      background: var(--card); padding:18px; border-radius:12px; box-shadow:var(--shadow);
+      display:flex; flex-direction:column; gap:16px;
+    }
+    .wx-side h5 { margin:0; }
+    .wx-alert { padding:12px; border-radius:10px; color:#7c1d1d; background: linear-gradient(90deg,#fff1f0,#fff1f0); border:1px solid #ffd6d6; }
+
+    /* small animated counters */
+    .wx-counter { font-size:28px; font-weight:700; }
+    .wx-muted { color:var(--text-secondary); }
+
+    /* subtle entrance animation */
+    .wx-anim-up { opacity:0; transform:translateY(12px); animation:wxUp .55s forwards; }
+    .wx-anim-up.delay-1 { animation-delay:0.06s; }
+    .wx-anim-up.delay-2 { animation-delay:0.12s; }
+    @keyframes wxUp { to { opacity:1; transform: translateY(0); } }
+
+    /* search input */
+    .wx-input { flex:1; min-width:0; }
+    .wx-input input { width:100%; padding:12px 14px; border-radius:10px; border:1px solid var(--border); }
+
+    .wx-btn { padding:10px 14px; border-radius:10px; background:var(--accent); color:#fff; border:none; display:inline-flex; gap:8px; align-items:center; }
+
+    .wx-footer-note { color:var(--text-secondary); font-size:0.9rem; text-align:center; margin-top:12px; }
+
+    /* small helper */
+    .wx-small { font-size:0.9rem; color:var(--text-secondary); }
+
+    /* make page visually contrast-safe */
+    [data-theme="dark"] .wx-hero { background:#0f172a22; }
+  </style>
+</head>
+<body>
+
+  <!-- === copy your same navbar & sidebar structure so theme matches index === -->
+     <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="your-logo.png" alt="">
+        </div>
+        <a href="#"><i class="bi bi-map"></i> Live HeatMap / Field</a>
+        <a href="weather.html"><i class="bi bi-cloud-sun"></i> Weather Forecast</a>
+        <a href="incident.html"><i class="bi bi-graph-up"></i> Incident Report</a>
+        <a href="#"><i class="bi bi-box"></i> Resource Visualization</a>
+        <a href="family.html"><i class="bi bi-people"></i> Family Identification Tool</a>
+        <a href="simulation.html"><i class="bi bi-play-circle"></i> Simulation</a>
+        <a href="#"><i class="bi bi-chat-dots"></i> Community</a>
+        <a href="Profile.html"><i class="bi bi-phone"></i> User Profile</a>
+        <a href="earthquake.html"><i class="bi bi-bricks"></i> Earthquake Prediction</a>
+        <a href="flood.html"><i class="bi bi-tsunami"></i> Flood Prediction</a>
+        <a href="cyclone_page.html"><i class="bi bi-wind"></i> Cyclone Prediction</a>
+
+
+    </div>
+  <div class="overlay" id="overlay"></div>
+
+  <nav class="navbar navbar-expand-lg navbar-light custom-navbar py-3">
+    <div class="container-fluid">
+      <div class="d-flex align-items-center">
+        <button class="btn toggle-btn me-2" id="toggleSidebar" aria-label="Toggle sidebar"><i class="bi bi-list fs-4"></i></button>
+        <h1 class="fw-bold mb-0 dashboard-title">DASHBOARD</h1>
+      </div>
+      <div class="mx-auto text-center">
+        <span class="brand-name">Disaster<span class="brand-highlight">X</span></span>
+      </div>
+      <div class="d-flex align-items-center gap-3 ms-auto">
+        <small class="text-muted live-text">Live · Monitoring</small>
+        <a href="login.html" class="btn custom-btn-outline">Log In</a>
+        <a href="signup.html" class="btn custom-btn">Sign Up</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- page content -->
+  <main class="wx-wrap">
+
+    <!-- Hero -->
+    <section class="wx-hero">
+      <div style="display:flex; align-items:flex-start; gap:16px; flex-wrap:wrap;">
+        <div class="wx-ico"><i class="bi bi-cloud-sun-fill"></i></div>
+        <div style="flex:1; min-width:200px;">
+          <h2>Weather Forecast — Live, Local, Actionable</h2>
+          <p>
+            Search any city or country to get current conditions and a 5-day forecast. The page highlights risk indicators
+            (heavy rain, high wind), sunrise/sunset times, and provides a visual forecast strip. Use this data to plan
+            drills, issue warnings, or coordinate response teams.
+          </p>
+
+          <div class="wx-search">
+            <div class="wx-input">
+              <input id="wx-city" type="text" placeholder="Enter city (e.g., Vasai, Mumbai, London) and press Enter" aria-label="city">
+            </div>
+            <button id="wx-search-btn" class="wx-btn"><i class="bi bi-search"></i> Search</button>
+            <button id="wx-loc-btn" class="wx-btn" style="background:#334155;"><i class="bi bi-geo-alt"></i> My Location</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Grid: main + side -->
+    <div class="wx-grid">
+
+      <!-- main -->
+      <section class="wx-main wx-anim-up">
+
+        <!-- Current -->
+        <div id="wx-current-wrap" class="wx-current">
+          <div class="wx-icon" id="wx-icon-large">☀</div>
+          <div style="flex:1;">
+            <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+              <div>
+                <div class="wx-temp" id="wx-temp">-- °C</div>
+                <div class="wx-muted" id="wx-desc">--</div>
+                <div class="wx-meta wx-small" id="wx-loc">--</div>
+              </div>
+              <div style="min-width:140px;">
+                <div class="wx-counter" id="wx-feels">--°</div>
+                <div class="wx-small">Feels like</div>
+              </div>
+            </div>
+
+            <div class="wx-stats" id="wx-pills">
+              <div class="wx-pill"><i class="bi bi-wind"></i> <span id="wx-wind">--</span></div>
+              <div class="wx-pill"><i class="bi bi-droplet"></i> <span id="wx-hum">--</span></div>
+              <div class="wx-pill"><i class="bi bi-speedometer2"></i> <span id="wx-press">--</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Forecast -->
+        <div id="wx-forecast-wrap" class="wx-forecast" aria-live="polite"></div>
+
+        <!-- extra info -->
+        <div style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap;">
+          <div class="wx-pill" style="min-width:200px;">
+            <i class="bi bi-sunrise"></i> Sunrise: <span id="wx-sunrise">--</span>
+          </div>
+          <div class="wx-pill" style="min-width:200px;">
+            <i class="bi bi-sunset"></i> Sunset: <span id="wx-sunset">--</span>
+          </div>
+          <div class="wx-pill" style="min-width:200px;">
+            <i class="bi bi-cloud-rain"></i> Precipitation: <span id="wx-precip">--</span>
+          </div>
+        </div>
+
+        <div class="wx-footer-note">Tip: For best results, use city name + country (e.g., "Vasai,IN" or "London,UK").</div>
+      </section>
+
+      <!-- side -->
+      <aside class="wx-side wx-anim-up delay-1">
+
+        <div>
+          <h5>Weather Summary</h5>
+          <p class="wx-small" id="wx-summary">Enter a city and get a detailed forecast. This panel will show risk indicators and recommendations.</p>
+        </div>
+
+        <div>
+          <h5>Risk Indicators</h5>
+          <div id="wx-risk-area">
+            <div class="wx-small wx-muted">No data yet</div>
+          </div>
+        </div>
+
+        <div>
+          <h5>Useful Links</h5>
+          <ul class="wx-small" style="padding-left:16px;">
+            <li><a href="#" id="wx-precip-guidance">When heavy rain is forecast</a></li>
+            <li><a href="#" id="wx-wind-guidance">High wind safety tips</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h5>Data source</h5>
+          <div class="wx-small">OpenWeatherMap • Updated live</div>
+        </div>
+
+      </aside>
+    </div>
+
+  </main>
+  <!-- Chatbot Floating Button + Chat Window -->
+    <div class="chatbot-container" id="chatbot">
+        <!-- Floating Icon -->
+        <button class="chatbot-btn" id="chatbotToggle" aria-label="Open chatbot">
+            <i class="bi bi-robot"></i>
+
+        </button>
+
+        <!-- Chat Window -->
+        <div class="chatbot-window" id="chatWindow">
+            <div class="chatbot-header">
+                <span>DisasterX Assistant</span>
+                <button class="chatbot-close-btn" id="chatClose">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="chatbot-body" id="chatBody">
+                <div class="bot-message">👋 Hi! I’m here to help with disaster info. Ask me anything.</div>
+            </div>
+            <div class="chatbot-footer">
+                <input type="text" id="chatInput" placeholder="Type your message..." />
+                <button id="chatSend"><i class="bi bi-send"></i></button>
+            </div>
+        </div>
+    </div>
+
+  <!-- footer: use the same markup as index so theme matches -->
+  <footer class="footer py-5 mt-auto">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <h5>About DisasterX</h5>
+                    <p>DisasterX is a real-time disaster management dashboard that empowers communities, responders, and
+                        authorities with live updates, analytics, and resource tracking during emergencies.</p>
+                </div>
+                <div class="col-md-2">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        
+                        <li><a href="#">Weather Forecast</a></li>
+                        <li><a href="Emergency.html">Emergency Services</a></li>
+                        <li><a href="simulation.html">Simulation</a></li>
+                        <li><a href="#">Community</a></li>
+                        <li><a href="earthquake.html">Earthquake Prediction</a></li>
+                        
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Contact Us</h5>
+                    <p>Email: support@disasterx.org</p>
+                    <p>Phone: +1 (800) 123-4567</p>
+                    <p>Location: Innovation Hub, India</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Follow Us</h5>
+                    <div class="social-icons d-flex gap-3">
+                        <a href="#"><i class="bi bi-facebook"></i></a>
+                        <a href="#"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#"><i class="bi bi-instagram"></i></a>
+                        <a href="#"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <small class="text-muted">&copy; 2025 DisasterX. All rights reserved.</small>
+            </div>
+        </div>
+    </footer>
+
+  <!-- scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+ <script>
+(function () {
+  // CONFIG
+  const USE_PROXY = false; // set true to use your backend proxy (recommended). If true, set API_BASE to your proxy URL.
+  const API_KEY = "a32896ff68778b2475188d66b9474633"; // <-- replace (or use proxy)
+  const API_BASE = USE_PROXY ? "http://localhost:5000/weather?q=" : "https://api.openweathermap.org/data/2.5/";
+
+  // DOM refs
+  const input = document.getElementById('wx-city');
+  const btn = document.getElementById('wx-search-btn');
+  const locBtn = document.getElementById('wx-loc-btn');
+  const iconLarge = document.getElementById('wx-icon-large');
+  const tempEl = document.getElementById('wx-temp');
+  const descEl = document.getElementById('wx-desc');
+  const locEl = document.getElementById('wx-loc');
+  const feelsEl = document.getElementById('wx-feels');
+  const windEl = document.getElementById('wx-wind');
+  const humEl = document.getElementById('wx-hum');
+  const pressEl = document.getElementById('wx-press');
+  const sunriseEl = document.getElementById('wx-sunrise');
+  const sunsetEl = document.getElementById('wx-sunset');
+  const precipEl = document.getElementById('wx-precip');
+  const summaryEl = document.getElementById('wx-summary');
+  const riskArea = document.getElementById('wx-risk-area');
+  const forecastWrap = document.getElementById('wx-forecast-wrap');
+
+  const popup = document.getElementById('popup');
+  const enterBtn = document.getElementById('enterBtn');
+  const closeBtn = document.getElementById('closeBtn');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  const toggleBtn = document.getElementById('toggleSidebar');
+
+  // Sidebar toggle
+  if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+          const isActive = sidebar.classList.toggle('active');
+          overlay.classList.toggle('active');
+          toggleBtn.setAttribute('aria-expanded', String(isActive));
+      });
+  }
+
+  if (overlay) {
+      overlay.addEventListener('click', () => {
+          sidebar.classList.remove('active');
+          overlay.classList.remove('active');
+          toggleBtn && toggleBtn.setAttribute('aria-expanded', 'false');
+      });
+  }
+
+  // Popup helpers
+  function hidePopup(perList = true) {
+      if (!popup) return;
+      popup.style.display = 'none';
+      popup.setAttribute('aria-hidden', 'true');
+      if (perList) sessionStorage.setItem('respondr_seen_popup', '1');
+  }
+
+  if (sessionStorage.getItem('respondr_seen_popup')) {
+      hidePopup(false);
+  }
+
+  enterBtn && enterBtn.addEventListener('click', () => hidePopup(true));
+  closeBtn && closeBtn.addEventListener('click', () => hidePopup(false));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hidePopup(false); });
+
+  // helpers
+  function iconEmoji(main) {
+    main = (main || "").toLowerCase();
+    if (main.includes('cloud')) return '☁';
+    if (main.includes('rain')) return '🌧';
+    if (main.includes('thunder')) return '⛈';
+    if (main.includes('snow')) return '❄';
+    if (main.includes('mist') || main.includes('fog')) return '🌫';
+    if (main.includes('clear')) return '☀';
+    if (main.includes('drizzle')) return '🌦';
+    return '🌤';
+  }
+
+  function localTimeFromUnix(unix, tzOffset) {
+    if (!unix) return '--';
+    const d = new Date((unix + (tzOffset || 0)) * 1000);
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function animateNumber(el, target) {
+    const start = parseFloat(el.textContent) || 0;
+    const duration = 700;
+    const startTime = performance.now();
+    function step(t) {
+      const p = Math.min((t - startTime) / duration, 1);
+      const value = Math.round(start + (target - start) * p);
+      el.textContent = value + (el.id === 'wx-feels' ? '°' : '');
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  // main fetch
+  async function fetchWeatherByCity(q) {
+    if (!q) return;
+    showLoading(true);
+    try {
+      let currUrl, forecastUrl;
+      if (USE_PROXY) {
+        const res = await fetch(`${API_BASE}${encodeURIComponent(q)}`);
+        const obj = await res.json();
+        if (obj.error) throw new Error(obj.error);
+        handleCurrentForecast(obj.current, obj.forecast);
+        showLoading(false);
+        return;
+      } else {
+        currUrl = `${API_BASE}weather?q=${encodeURIComponent(q)}&units=metric&appid=${API_KEY}`;
+        forecastUrl = `${API_BASE}forecast?q=${encodeURIComponent(q)}&units=metric&appid=${API_KEY}`;
+      }
+
+      const [currRes, fcRes] = await Promise.all([fetch(currUrl), fetch(forecastUrl)]);
+      const curr = await currRes.json();
+      const fc = await fcRes.json();
+
+      if (curr.cod && curr.cod !== 200) throw new Error(curr.message || 'Failed to fetch current weather');
+      if (fc.cod && Number(fc.cod) !== 200) throw new Error(fc.message || 'Failed to fetch forecast');
+
+      handleCurrentForecast(curr, fc);
+    } catch (err) {
+      summaryEl.textContent = 'Error: ' + (err.message || 'Network error');
+    } finally {
+      showLoading(false);
+    }
+  }
+
+  function handleCurrentForecast(curr, fc) {
+    const name = curr.name;
+    const country = curr.sys && curr.sys.country ? curr.sys.country : '';
+    const main = curr.weather && curr.weather[0] ? curr.weather[0].main : '';
+    const desc = curr.weather && curr.weather[0] ? curr.weather[0].description : '';
+    const temp = Math.round(curr.main.temp);
+    const feels = Math.round(curr.main.feels_like);
+    const wind = curr.wind && curr.wind.speed ? curr.wind.speed : 0;
+    const hum = curr.main && curr.main.humidity ? curr.main.humidity : 0;
+    const press = curr.main && curr.main.pressure ? curr.main.pressure : 0;
+    const sunrise = curr.sys && curr.sys.sunrise ? curr.sys.sunrise : null;
+    const sunset = curr.sys && curr.sys.sunset ? curr.sys.sunset : null;
+    const tz = curr.timezone || 0;
+    const precip = (curr.rain && curr.rain["1h"]) ? curr.rain["1h"] : ((curr.snow && curr.snow["1h"]) ? curr.snow["1h"] : 0);
+
+    iconLarge.textContent = iconEmoji(main);
+    tempEl.textContent = `${temp} °C`;
+    descEl.textContent = (desc || '').replace(/\b\w/g, c => c.toUpperCase());
+    locEl.textContent = `${name}${country ? ', ' + country : ''}`;
+    animateNumber(feelsEl, feels);
+    windEl.textContent = `${wind} m/s`;
+    humEl.textContent = `${hum}%`;
+    pressEl.textContent = `${press} hPa`;
+    sunriseEl.textContent = localTimeFromUnix(sunrise, tz);
+    sunsetEl.textContent = localTimeFromUnix(sunset, tz);
+    precipEl.textContent = (precip ? (precip + ' mm (1h)') : '0 mm');
+
+    summaryEl.textContent = `Current: ${temp}°C, ${desc}. Wind ${wind} m/s, Humidity ${hum}%.`;
+
+    const grouped = groupForecastByDay(fc.list, curr.timezone || 0);
+    renderForecast(grouped);
+
+    const risks = [];
+    if (hum >= 90 && temp < 25 && precip > 10) risks.push('High chance of heavy rain / flash flooding');
+    if (wind >= 15) risks.push('High winds expected — secure loose items');
+
+    const severeKeywords = (fc.list || []).some(it => {
+      const w = (it.weather && it.weather[0] && it.weather[0].main || '').toLowerCase();
+      return w.includes('thunder') || w.includes('tornado') || w.includes('extreme') || w.includes('hurricane');
+    });
+    if (severeKeywords) risks.push('Severe storms possible — monitor updates');
+
+    renderRisks(risks);
+  }
+
+  function groupForecastByDay(list, tzOffsetSeconds) {
+    const days = {};
+    list.forEach(item => {
+      const local = new Date((item.dt + (tzOffsetSeconds || 0)) * 1000);
+      const dayKey = local.toISOString().slice(0,10);
+      if (!days[dayKey]) days[dayKey] = { min: 999, max: -999, icons: [], temps: [], date: local };
+      const t = item.main.temp;
+      days[dayKey].min = Math.min(days[dayKey].min, t);
+      days[dayKey].max = Math.max(days[dayKey].max, t);
+      days[dayKey].icons.push(item.weather[0].icon);
+      days[dayKey].temps.push(t);
+    });
+    return Object.values(days).sort((a,b) => a.date - b.date).slice(0,5);
+  }
+
+  function renderForecast(days) {
+    forecastWrap.innerHTML = '';
+    days.forEach((d, i) => {
+      const icon = mostFrequent(d.icons) || '01d';
+      const dateStr = new Date(d.date).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+      const html = `
+        <div class="wx-day wx-anim-up delay-2" style="animation-delay:${0.06*i}s;">
+          <div class="d-date">${dateStr}</div>
+          <img src="http://openweathermap.org/img/wn/${icon}.png" alt="icon">
+          <div class="d-desc wx-small">${Math.round(d.temps.reduce((a,b)=>a+b,0)/d.temps.length)}° avg</div>
+          <div class="d-temp">${Math.round(d.max)}° / ${Math.round(d.min)}°</div>
+        </div>
+      `;
+      forecastWrap.insertAdjacentHTML('beforeend', html);
+    });
+  }
+
+  function mostFrequent(arr) {
+    if (!arr || !arr.length) return null;
+    const cnt = {};
+    let best = arr[0], bestCount = 0;
+    arr.forEach(v => { cnt[v] = (cnt[v]||0) + 1; if (cnt[v] > bestCount) { best = v; bestCount = cnt[v]; } });
+    return best;
+  }
+
+  function renderRisks(list) {
+    if (!list || list.length === 0) {
+      riskArea.innerHTML = '<div class="wx-small wx-muted">No immediate risks detected.</div>';
+      return;
+    }
+    riskArea.innerHTML = '';
+    list.forEach(r => {
+      const el = document.createElement('div');
+      el.className = 'wx-alert';
+      el.textContent = r;
+      riskArea.appendChild(el);
+    });
+  }
+
+  function showLoading(isLoading) {
+    btn.disabled = isLoading;
+    if (isLoading) btn.innerHTML = '<i class="bi bi-arrow-repeat bx-spin"></i> Loading';
+    else btn.innerHTML = '<i class="bi bi-search"></i> Search';
+  }
+
+  locBtn.addEventListener('click', () => {
+    if (!navigator.geolocation) {
+      summaryEl.textContent = 'Geolocation not supported in this browser.';
+      return;
+    }
+    summaryEl.textContent = 'Locating…';
+    navigator.geolocation.getCurrentPosition(async pos => {
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+      if (USE_PROXY) {
+        fetchWeatherByCity(`${lat},${lon}`);
+      } else {
+        fetchWeatherByCoords(lat, lon);
+      }
+    }, err => {
+      summaryEl.textContent = 'Unable to get location.';
+    });
+  });
+
+  async function fetchWeatherByCoords(lat, lon) {
+    showLoading(true);
+    try {
+      const curr = await fetch(`${API_BASE}weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`).then(r=>r.json());
+      if (curr.cod && curr.cod !== 200) throw new Error(curr.message || 'current error');
+
+      const fc = await fetch(`${API_BASE}forecast?lat=${lat}&lon=${lon}&units=metric&appid=${API_KEY}`).then(r=>r.json());
+      if (fc.cod && Number(fc.cod) !== 200) throw new Error(fc.message || 'forecast error');
+
+      handleCurrentForecast(curr, fc);
+    } catch (err) {
+      summaryEl.textContent = 'Error '+(err.message || 'fetch error');
+    } finally {
+      showLoading(false);
+    }
+  }
+
+  // UI events
+  btn.addEventListener('click', () => {
+    const q = input.value.trim();
+    if (!q) { input.focus(); return; }
+    fetchWeatherByCity(q);
+  });
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') btn.click(); });
+
+  // initial demo load
+  window.addEventListener('load', () => {
+    const initial = input.value.trim() || 'Vasai';
+    input.value = initial;
+    setTimeout(()=>fetchWeatherByCity(initial), 200);
+  });
+
+})();
+</script>
+</body>
+</html>

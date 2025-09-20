@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Missing Family Member - DisasterX</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body.dark-mode {
+            background-color: #121212;
+            color: #f8f9fa;
+        }
+        .dark-mode .card {
+            background-color: #1e1e1e;
+            color: #fff;
+        }
+        .dark-mode .navbar {
+            background-color: #1f1f1f !important;
+        }
+        .dark-mode .navbar .navbar-brand {
+            color: #fff;
+        }
+        .card {
+            max-width: 95%;
+            margin: 0 auto;
+        }
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+        }
+        .popup-overlay.active {
+            display: block;
+        }
+        .sidebar {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        .sidebar.active {
+            transform: translateX(0);
+        }
+        .chatbot-window {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 300px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .chatbot-window.active {
+            display: block;
+        }
+        #pastReportsCard {
+            transition: opacity 0.3s ease;
+        }
+        #pastReportsCard.loading {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <span>DisasterX</span>
+        </div>
+        <a href="#"><i class="bi bi-map"></i> Live HeatMap / Field</a>
+        <a href="#"><i class="bi bi-cloud-sun"></i> Weather Forecast</a>
+        <a href="incident.html"><i class="bi bi-graph-up"></i> Incident Reporting</a>
+        <a href="#"><i class="bi bi-box"></i> Resource Visualization</a>
+        <a href="family.html"><i class="bi bi-people"></i> Family Identification Tool</a>
+        <a href="simulation.html"><i class="bi bi-play-circle"></i> Simulation</a>
+        <a href="#"><i class="bi bi-chat-dots"></i> Community</a>
+        <a href="#"><i class="bi bi-phone"></i> User Profile</a>
+        <a href="earthquake.html"><i class="bi bi-bricks"></i> Earthquake Prediction</a>
+        <a href="flood.html" class="active"><i class="bi bi-tsunami"></i> Flood Prediction</a>
+        <a href="cyclone_page.html"><i class="bi bi-wind"></i> Cyclone Prediction</a>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <nav class="navbar navbar-expand-lg navbar-light custom-navbar py-3">
+        <div class="container-fluid">
+            <div class="d-flex align-items-center">
+                <button class="btn toggle-btn me-2" id="toggleSidebar" aria-label="Toggle sidebar" aria-controls="sidebar" aria-expanded="false">
+                    <i class="bi bi-list fs-4"></i>
+                </button>
+                <h1 class="fw-bold mb-0 dashboard-title">DASHBOARD</h1>
+            </div>
+            <div class="mx-auto text-center">
+                <span class="brand-name">Disaster<span class="brand-highlight">X</span></span>
+            </div>
+            <div class="d-flex align-items-center gap-3 ms-auto">
+                <small class="text-muted live-text">Live &middot; Monitoring</small>
+                <a href="login.html" class="btn custom-btn-outline" id="loginBtn">Log In</a>
+                <a href="signup.html" class="btn custom-btn" id="signupBtn">Sign Up</a>
+                <button class="btn btn-danger d-none" id="logoutBtn">Logout</button>
+                <button class="btn btn-secondary" id="themeToggle">🌙 Dark Mode</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container-fluid my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                <div class="card shadow p-4">
+                    <h3 class="mb-4">REPORT A MISSING FAMILY MEMBER</h3>
+                    <div class="card shadow p-4 mb-4">
+                        <h4 class="mb-3 text-primary">Reporter Information</h4>
+                        <form id="reportForm">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Your Name</label>
+                                    <input type="text" class="form-control" id="reporterName" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Your Phone Number</label>
+                                    <input type="text" class="form-control" id="reporterPhone" placeholder="+91 9876543210" pattern="\+?[0-9]{10,15}" title="Enter a valid phone number (e.g., +919876543210)" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card shadow p-4 mb-4">
+                            <h4 class="mb-3 text-danger">Lost Person Information</h4>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="nameInput" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Age</label>
+                                    <input type="number" class="form-control" id="ageInput" min="0" max="150" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Gender</label>
+                                    <select class="form-select" id="genderInput" required>
+                                        <option value="">Select...</option>
+                                        <option>Male</option>
+                                        <option>Female</option>
+                                        <option>Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Last Seen Location</label>
+                                    <input type="text" class="form-control" id="locationInput" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Status</label>
+                                    <select class="form-select" id="statusInput" required>
+                                        <option value="Missing">Missing</option>
+                                        <option value="Found">Found</option>
+                                        <option value="Injured">Injured</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Blood Group</label>
+                                    <select class="form-select" id="bloodGroupInput">
+                                        <option value="">Not Known</option>
+                                        <option>A+</option>
+                                        <option>A-</option>
+                                        <option>B+</option>
+                                        <option>B-</option>
+                                        <option>O+</option>
+                                        <option>O-</option>
+                                        <option>AB+</option>
+                                        <option>AB-</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Lost Person Phone (Optional)</label>
+                                    <input type="text" class="form-control" id="lostPhone" placeholder="+91 9876543210">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Upload Recent Photo (Optional)</label>
+                                    <input type="file" class="form-control" id="photoInput" accept="image/*">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-danger btn-lg px-5">Submit Report</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="card shadow p-4 mb-4 container-fluid" id="pastReportsCard" style="display:none;">
+        <h4 class="mb-3 text-info">Matching Reports Found</h4>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Reporter</th>
+                        <th>Phone</th>
+                        <th>Missing Person</th>
+                        <th>Age</th>
+                        <th>Gender</th>
+                        <th>Last Seen</th>
+                        <th>Status</th>
+                        <th>Blood Group</th>
+                        <th>Lost Person Phone</th>
+                        <th>Photo</th>
+                        <th>Date Reported</th>
+                    </tr>
+                </thead>
+                <tbody id="pastReportsBody"></tbody>
+            </table>
+            <div id="noMatchesMessage" class="text-center text-muted" style="display:none;">
+                No matching reports found.
+            </div>
+        </div>
+    </div>
+
+    <div class="chatbot-container" id="chatbot">
+        <button class="chatbot-btn" id="chatbotToggle" aria-label="Open chatbot">
+            <i class="bi bi-robot"></i>
+        </button>
+        <div class="chatbot-window" id="chatWindow">
+            <div class="chatbot-header">
+                <span>DisasterX Assistant</span>
+                <button class="chatbot-close-btn" id="chatClose">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="chatbot-body" id="chatBody">
+                <div class="bot-message">👋 Hi! I'm here to help with disaster info. Ask me anything.</div>
+            </div>
+            <div class="chatbot-footer">
+                <input type="text" id="chatInput" placeholder="Type your message..." />
+                <button id="chatSend"><i class="bi bi-send"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer py-5 mt-auto">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <h5>About DisasterX</h5>
+                    <p>DisasterX is a real-time disaster management dashboard that empowers communities, responders, and authorities with live updates, analytics, and resource tracking during emergencies.</p>
+                </div>
+                <div class="col-md-2">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Live HeatMap</a></li>
+                        <li><a href="#">Weather Forecast</a></li>
+                        <li><a href="#">Resource Tools</a></li>
+                        <li><a href="#">Simulation</a></li>
+                        <li><a href="#">Community</a></li>
+                        <li><a href="#">Earthquake Prediction</a></li>
+                        <li><a href="#">Flood Prediction</a></li>
+                        <li><a href="#">Cyclone Prediction</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Contact Us</h5>
+                    <p>Email: support@disasterx.org</p>
+                    <p>Phone: +1 (800) 123-4567</p>
+                    <p>Location: Innovation Hub, India</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Follow Us</h5>
+                    <div class="social-icons d-flex gap-3">
+                        <a href="#"><i class="bi bi-facebook"></i></a>
+                        <a href="#"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#"><i class="bi bi-instagram"></i></a>
+                        <a href="#"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <small class="text-muted">&copy; 2025 DisasterX. All rights reserved.</small>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSz5L6YRK2DR_mkrFgnHucp6VLgNQKYX8",
+            authDomain: "public-announcement-d58d7.firebaseapp.com",
+            projectId: "public-announcement-d58d7",
+            storageBucket: "public-announcement-d58d7.appspot.com",
+            messagingSenderId: "51806474422",
+            appId: "1:51806474422:web:d3b823833bbfa994ebd617",
+            measurementId: "G-2KZ43GBMNM"
+        };
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+            const storage = getStorage(app);
+
+            const form = document.getElementById("reportForm");
+            const pastReportsCard = document.getElementById("pastReportsCard");
+            const pastReportsBody = document.getElementById("pastReportsBody");
+            const noMatchesMessage = document.getElementById("noMatchesMessage");
+
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const submitBtn = document.querySelector("button[type=submit]");
+                if (!submitBtn) {
+                    console.error("Submit button not found");
+                    alert("❌ Error: Submit button not found. Check HTML structure.");
+                    return;
+                }
+                submitBtn.disabled = true;
+                submitBtn.textContent = "Submitting...";
+
+                try {
+                    const reporterName = document.getElementById("reporterName").value.trim();
+                    const reporterPhone = document.getElementById("reporterPhone").value.trim();
+                    const name = document.getElementById("nameInput").value.trim();
+                    const age = parseInt(document.getElementById("ageInput").value.trim());
+                    const gender = document.getElementById("genderInput").value;
+                    const location = document.getElementById("locationInput").value.trim();
+                    const status = document.getElementById("statusInput").value;
+                    const bloodGroup = document.getElementById("bloodGroupInput").value;
+                    const lostPhone = document.getElementById("lostPhone").value.trim();
+                    const photoFile = document.getElementById("photoInput").files[0];
+
+                    let photoUrl = "";
+                    if (photoFile) {
+                        const safeFileName = photoFile.name.replace(/\s+/g, "_");
+                        const photoRef = ref(storage, `missingFamilyReports/${Date.now()}_${safeFileName}`);
+                        await uploadBytes(photoRef, photoFile);
+                        photoUrl = await getDownloadURL(photoRef);
+                    }
+
+                    // Normalize phone numbers (for storage, not matching)
+                    const normalizePhone = (phone) => phone ? phone.replace(/[\s+()-]/g, "") : null;
+                    const normalizedReporterPhone = normalizePhone(reporterPhone);
+                    const normalizedLostPhone = normalizePhone(lostPhone);
+
+                    // Build document
+                    const docData = {
+                        reporterName,
+                        reporterPhone: normalizedReporterPhone || null,
+                        name,
+                        nameLower: name.toLowerCase(),
+                        age: isNaN(age) ? null : age,
+                        gender,
+                        lastSeen: location,
+                        status,
+                        bloodGroup: bloodGroup || "Not Provided",
+                        lostPhone: normalizedLostPhone || null,
+                        photoUrl,
+                        createdAt: serverTimestamp()
+                    };
+
+                    // Submit report to missingFamilyReports
+                    const docRef = await addDoc(collection(db, "missingFamilyReports"), docData);
+                    console.log("Submitted report ID:", docRef.id, "Data:", docData);
+
+                    // Show loading state
+                    pastReportsCard.classList.add("loading");
+                    pastReportsCard.style.display = "block";
+                    pastReportsBody.innerHTML = "<tr><td colspan='11' class='text-center'>Checking for matches...</td></tr>";
+                    noMatchesMessage.style.display = "none";
+
+                    // Build query conditions for nameLower, age, gender, bloodGroup
+                    const conditions = [];
+                    if (name) conditions.push(where("nameLower", "==", name.toLowerCase()));
+                    if (!isNaN(age)) conditions.push(where("age", "==", age));
+                    if (gender) conditions.push(where("gender", "==", gender));
+                    if (bloodGroup && bloodGroup !== "") conditions.push(where("bloodGroup", "==", bloodGroup));
+
+                    let matches = [];
+                    if (conditions.length >= 2 && name) { // Require name and at least one other field
+                        // Query missingFamilyReports, exclude new report
+                        const q1 = query(collection(db, "missingFamilyReports"), ...conditions);
+                        const snapshot1 = await getDocs(q1);
+                        matches = snapshot1.docs
+                            .filter(doc => doc.id !== docRef.id)
+                            .map(doc => ({ id: doc.id, ...doc.data(), collection: "missingFamilyReports" }));
+
+                        // Query familyReports
+                        const q2 = query(collection(db, "familyReports"), ...conditions);
+                        const snapshot2 = await getDocs(q2);
+                        matches = matches.concat(snapshot2.docs.map(doc => ({ id: doc.id, ...doc.data(), collection: "familyReports" })));
+
+                        console.log("Query conditions:", conditions.map(c => `${c._field.path}==${c._value}`));
+                        console.log("Matches found:", matches);
+
+                        // Log all familyReports for debugging
+                        const allFamilyReports = await getDocs(collection(db, "familyReports"));
+                        console.log("All familyReports:", allFamilyReports.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+                    } else {
+                        console.log("Insufficient query conditions (need name and at least one other field).");
+                    }
+
+                    // Display matching reports
+                    pastReportsBody.innerHTML = "";
+                    pastReportsCard.classList.remove("loading");
+                    if (matches.length > 0) {
+                        pastReportsCard.style.display = "block";
+                        noMatchesMessage.style.display = "none";
+                        matches.forEach(data => {
+                            let date = "N/A";
+                            if (data.createdAt && data.createdAt.seconds) {
+                                date = new Date(data.createdAt.seconds * 1000).toLocaleString();
+                            }
+                            pastReportsBody.innerHTML += `
+                                <tr>
+                                    <td>${data.reporterName || "-"}</td>
+                                    <td>${data.reporterPhone || "-"}</td>
+                                    <td>${data.name || "-"}</td>
+                                    <td>${data.age || "-"}</td>
+                                    <td>${data.gender || "-"}</td>
+                                    <td>${data.lastSeen || "-"}</td>
+                                    <td><span class="badge bg-${data.status === "Missing" ? "danger" : data.status === "Found" ? "success" : "warning"}">${data.status || "-"}</span></td>
+                                    <td>${data.bloodGroup || "-"}</td>
+                                    <td>${data.lostPhone || "-"}</td>
+                                    <td>${data.photoUrl ? `<img src="${data.photoUrl}" width="60" height="60" alt="Photo">` : "No Photo"}</td>
+                                    <td>${date}</td>
+                                </tr>
+                            `;
+                        });
+                        pastReportsCard.scrollIntoView({ behavior: "smooth", block: "start" });
+                        alert("✅ Report submitted successfully! Matching reports found and displayed below.");
+                    } else {
+                        pastReportsCard.style.display = "block";
+                        noMatchesMessage.style.display = "block";
+                        pastReportsBody.innerHTML = "";
+                        pastReportsCard.scrollIntoView({ behavior: "smooth", block: "start" });
+                        alert("✅ Report submitted successfully! No matching reports found.");
+                    }
+                } catch (error) {
+                    console.error("Firestore error:", error.code || "unknown", error.message || error);
+                    pastReportsCard.classList.remove("loading");
+                    pastReportsCard.style.display = "block";
+                    pastReportsBody.innerHTML = "<tr><td colspan='11' class='text-center text-danger'>Error checking for matches</td></tr>";
+                    noMatchesMessage.style.display = "none";
+                    alert("❌ Failed to submit report or check matches. Check console for details.");
+                } finally {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = "Submit Report";
+                    }
+                }
+            });
+
+            // Sidebar toggle
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const toggleBtn = document.getElementById('toggleSidebar');
+            function closeSidebar() {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            }
+            toggleBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+            });
+            overlay.addEventListener('click', closeSidebar);
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeSidebar();
+            });
+
+            // Theme toggle
+            const themeToggle = document.getElementById("themeToggle");
+            if (themeToggle) {
+                themeToggle.addEventListener("click", () => {
+                    document.body.classList.toggle("dark-mode");
+                    themeToggle.textContent = document.body.classList.contains("dark-mode") ? "☀️ Light Mode" : "🌙 Dark Mode";
+                });
+            }
+
+            // Chatbot toggle
+            const chatbotToggle = document.getElementById("chatbotToggle");
+            const chatWindow = document.getElementById("chatWindow");
+            const chatClose = document.getElementById("chatClose");
+            chatbotToggle.addEventListener("click", () => {
+                chatWindow.classList.toggle("active");
+            });
+            chatClose.addEventListener("click", () => {
+                chatWindow.classList.remove("active");
+            });
+
+            // Auth check
+            const loginBtn = document.getElementById("loginBtn");
+            const signupBtn = document.getElementById("signupBtn");
+            const logoutBtn = document.getElementById("logoutBtn");
+            function checkAuth() {
+                const user = localStorage.getItem("disasterx_logged_in");
+                if (user) {
+                    loginBtn.classList.add("d-none");
+                    signupBtn.classList.add("d-none");
+                    logoutBtn.classList.remove("d-none");
+                } else {
+                    loginBtn.classList.remove("d-none");
+                    signupBtn.classList.remove("d-none");
+                    logoutBtn.classList.add("d-none");
+                    form.querySelector("button[type=submit]").disabled = true;
+                    alert("Please log in to submit a report.");
+                }
+            }
+            logoutBtn.addEventListener("click", () => {
+                localStorage.removeItem("disasterx_logged_in");
+                window.location.replace("login.html");
+            });
+            checkAuth();
+        } catch (error) {
+            console.error("Firebase initialization error:", error);
+            alert("❌ Failed to initialize Firebase. Check console for details.");
+        }
+    </script>
+</body>
+</html>

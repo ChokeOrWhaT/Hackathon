@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Services - Resource Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2 style="color: white;">DisasterX</h2>
+        </div>
+        <a href="#"><i class="bi bi-map"></i> Live HeatMap / Field</a>
+        <a href="#"><i class="bi bi-cloud-sun"></i> Weather Forecast</a>
+        <a href="#"><i class="bi bi-graph-up"></i> Modern Reporting Graph</a>
+        <a href="#"><i class="bi bi-box"></i> Resource Visualization</a>
+        <a href="#"><i class="bi bi-people"></i> Family Identification Tool</a>
+        <a href="#"><i class="bi bi-play-circle"></i> Simulation</a>
+        <a href="#"><i class="bi bi-chat-dots"></i> Community</a>
+        <a href="#"><i class="bi bi-phone"></i> USER MOBILE</a>
+        <a href="#"><i class="bi bi-bricks"></i> Earthquake Prediction</a>
+        <a href="#"><i class="bi bi-tsunami"></i> Flood Prediction</a>
+        <a href="#"><i class="bi bi-wind"></i> Cyclone Prediction</a>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Navbar -->
+    <nav class="custom-navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <button class="toggle-btn" id="toggleSidebar" aria-label="Toggle sidebar" aria-controls="sidebar" aria-expanded="false">
+                    <i class="bi bi-list"></i>
+                </button>
+                <h1 class="dashboard-title">DASHBOARD</h1>
+            </div>
+            <div class="nav-center">
+                <span class="brand-name">Disaster<span class="brand-highlight">X</span></span>
+            </div>
+            <div class="nav-right">
+                <small class="live-text">Live &middot; Monitoring</small>
+                <a href="login.html" class="custom-btn-outline">Log In</a>
+                <a href="signup.html" class="custom-btn">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2>Emergency Services Resource Portal</h2>
+                <p>Access emergency resources, request assistance, and find nearby services</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Overview Section -->
+    <section class="overview-section" id="overview">
+        <div class="container">
+            <div class="overview-content">
+                <div class="overview-header">
+                    <h2>Emergency Services Portal Overview</h2>
+                    <p>Your comprehensive platform for emergency resources and assistance during critical situations</p>
+                </div>
+                <div class="overview-grid">
+                    <div class="overview-text">
+                        <p>Our comprehensive emergency services platform provides critical resources and tools during disaster situations. This portal is designed to help you quickly access emergency services, find nearby resources, and request assistance when you need it most.</p>
+                        <p>You can find nearby emergency services using our interactive map, which shows hospitals, police stations, fire departments, and shelters in your area.</p>
+                        <p>In addition to location services, this portal provides access to emergency contact numbers, resource request forms, and information about available emergency resources in your area. Whether you need medical assistance, shelter, food supplies, or other emergency resources, this platform connects you with the help you need.</p>
+                        <p>Our goal is to provide a comprehensive, easy-to-use emergency management system that can assist individuals and communities during critical situations. The platform is designed to work on both desktop and mobile devices, ensuring you can access emergency services whenever and wherever you need them.</p>
+                    </div>
+                    <div class="overview-image">
+                        <i class="fas fa-hands-helping"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Map Section -->
+    <section class="map-section" id="live-map">
+        <div class="container">
+            <h2 class="section-title">Live Map - Nearby Emergency Services</h2>
+            <div class="map-container">
+                <div id="map"></div>
+                <div class="map-controls">
+                    <h3>Nearby Services</h3>
+                    <div class="filters">
+                        <label><input type="checkbox" id="show_hospital" checked/> Hospital</label>
+                        <label><input type="checkbox" id="show_police" checked/> Police</label>
+                        <label><input type="checkbox" id="show_fire" checked/> Fire</label>
+                        <label><input type="checkbox" id="show_shelter" checked/> Shelter</label>
+                    </div>
+                    <div class="radius-control">
+                        <label>Radius (meters):</label>
+                        <input type="number" id="radius" value="2000"/>
+                    </div>
+                    <div class="button-group">
+                        <button id="scan"><i class="fas fa-search"></i> Scan Nearby</button>
+                        <button id="locate"><i class="fas fa-location-arrow"></i> Center on Me</button>
+                        <button id="clearRoute"><i class="fas fa-times"></i> Clear Route</button>
+                    </div>
+                    <div class="results-list" id="results"></div>
+                    <div class="status" id="status">Status: waiting for location...</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resources Section -->
+    <section class="resources" id="resources">
+        <div class="container">
+            <h2 class="section-title">Emergency Resources</h2>
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Food & Water</h3>
+                        <p>Find nearby food distribution centers, clean water sources, and community kitchens during emergencies.</p>
+                    </div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-first-aid"></i>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Medical Supplies</h3>
+                        <p>Locate pharmacies, medical camps, and first aid centers with available supplies near your location.</p>
+                    </div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-house-damage"></i>
+                    </div>
+                    <div class="resource-content">
+                        <h3>Disaster Relief</h3>
+                        <p>Access disaster relief resources including temporary shelters, emergency kits, and evacuation support.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Emergency Form Section -->
+    <section class="emergency-form-section" id="request-form">
+        <div class="container">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>Emergency Resource Request</h2>
+                    <p>Fill out this form to request essential resources during an emergency</p>
+                </div>
+                <form id="resourceRequestForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="fullName">Full Name *</label>
+                            <input type="text" id="fullName" placeholder="Your full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contactInfo">Contact Information *</label>
+                            <input type="text" id="contactInfo" placeholder="Phone number or email" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="resourceType">Type of Resource Needed *</label>
+                        <select id="resourceType" required>
+                            <option value="">Select Resource Type</option>
+                            <option value="food">Food & Water</option>
+                            <option value="medical">Medical Supplies</option>
+                            <option value="shelter">Shelter & Housing</option>
+                            <option value="transport">Transportation</option>
+                            <option value="other">Other Resources</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="urgency">Urgency Level *</label>
+                        <select id="urgency" required>
+                            <option value="">Select Urgency Level</option>
+                            <option value="low">Low - Need within few days</option>
+                            <option value="medium">Medium - Need within 24 hours</option>
+                            <option value="high">High - Immediate need</option>
+                            <option value="critical">Critical - Life-threatening situation</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="peopleCount">Number of People *</label>
+                        <input type="number" id="peopleCount" min="1" placeholder="How many people need help?" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="resourceDetails">Specific Needs *</label>
+                        <textarea id="resourceDetails" placeholder="Please describe what you need in detail (e.g., 'Need drinking water', 'Require insulin medication', 'Need safe shelter for family of 4')" required></textarea>
+                    </div>
+                    <div class="location-sharing">
+                        <div class="location-header">
+                            <h3><i class="fas fa-map-marker-alt"></i> Your Location</h3>
+                        </div>
+                        <p>Your location helps volunteers find you quickly. Your location data will only be shared with verified emergency responders.</p>
+                        <div class="form-group">
+                            <label for="locationDetailsForm">Location Details *</label>
+                            <input type="text" id="locationDetailsForm" placeholder="Your address, landmark, or area" required>
+                        </div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="additionalInfo">Additional Information</label>
+                        <textarea id="additionalInfo" placeholder="Any other important information that responders should know"></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-paper-plane"></i> SUBMIT RESOURCE REQUEST
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Emergency Numbers -->
+    <section class="emergency-numbers" id="numbers">
+        <div class="container">
+            <h2 class="section-title">Emergency Contact Numbers</h2>
+            <div class="numbers-grid">
+                <div class="number-card">
+                    <h3><i class="fas fa-phone-alt"></i> General Emergency</h3>
+                    <p><i class="fas fa-phone"></i> 112</p>
+                </div>
+                <div class="number-card">
+                    <h3><i class="fas fa-ambulance"></i> Medical Emergency</h3>
+                    <p><i class="fas fa-phone"></i> 108</p>
+                </div>
+                <div class="number-card">
+                    <h3><i class="fas fa-fire"></i> Fire Department</h3>
+                    <p><i class="fas fa-phone"></i> 101</p>
+                </div>
+                <div class="number-card">
+                    <h3><i class="fas fa-shield-alt"></i> Police</h3>
+                    <p><i class="fas fa-phone"></i> 100</p>
+                </div>
+                <div class="number-card">
+                    <h3><i class="fas fa-road"></i> Road Accident</h3>
+                    <p><i class="fas fa-phone"></i> 1073</p>
+                </div>
+                <div class="number-card">
+                    <h3><i class="fas fa-house-damage"></i> Disaster Management</h3>
+                    <p><i class="fas fa-phone"></i> 1070</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Disaster Relief NGOs -->
+    <section class="ngo-section" id="ngos">
+        <div class="container">
+            <h2 class="section-title">Disaster Relief NGOs</h2>
+            <div class="numbers-grid">
+                <div class="ngo-card">
+                    <h3><i class="fas fa-hands-helping"></i> Goonj</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> J-93, Sarita Vihar, New Delhi - 110076</p>
+                    <p><i class="fas fa-phone"></i> +91-11-26972351</p>
+                    <p><i class="fas fa-globe"></i> <a href="https://goonj.org" target="_blank">goonj.org</a></p>
+                </div>
+                <div class="ngo-card">
+                    <h3><i class="fas fa-hands-helping"></i> SEEDS India</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> 15/A, Institutional Area, R.K. Puram, New Delhi - 110066</p>
+                    <p><i class="fas fa-phone"></i> +91-11-26174272</p>
+                    <p><i class="fas fa-globe"></i> <a href="https://www.seedsindia.org" target="_blank">seedsindia.org</a></p>
+                </div>
+                <div class="ngo-card">
+                    <h3><i class="fas fa-hands-helping"></i> ActionAid India</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> R-7, Hauz Khas Enclave, New Delhi - 110016</p>
+                    <p><i class="fas fa-phone"></i> +91-11-40640500</p>
+                    <p><i class="fas fa-globe"></i> <a href="https://www.actionaidindia.org" target="_blank">actionaidindia.org</a></p>
+                </div>
+                <div class="ngo-card">
+                    <h3><i class="fas fa-hands-helping"></i> CARE India</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> A-12, Bhilwara Towers, Vasant Vihar, New Delhi - 110057</p>
+                    <p><i class="fas fa-phone"></i> +91-11-26566401</p>
+                    <p><i class="fas fa-globe"></i> <a href="https://www.careindia.org" target="_blank">careindia.org</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SOS Emergency Section -->
+    <section class="sos-section" id="sos">
+        <div class="container">
+            <h2 class="section-title">SOS Emergency Alert</h2>
+            <div class="sos-container">
+                <h3>Emergency SOS Button</h3>
+                <button id="sosBtn" class="sos-btn">SOS</button>
+                <p class="sos-instructions">Press SOS to send your live location via WhatsApp to emergency contacts</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="modal-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>Request Submitted Successfully!</h2>
+            <p>Your resource request has been shared with emergency responders and volunteers in your area.</p>
+            <p id="responseTime">Average response time: 15-30 minutes</p>
+            <button class="modal-btn" onclick="closeModal()">OK</button>
+        </div>
+    </div>
+    <!-- Chatbot Floating Button + Chat Window -->
+    <div class="chatbot-container" id="chatbot">
+        <!-- Floating Icon -->
+        <button class="chatbot-btn" id="chatbotToggle" aria-label="Open chatbot">
+            <i class="bi bi-robot"></i>
+
+        </button>
+
+        <!-- Chat Window -->
+        <div class="chatbot-window" id="chatWindow">
+            <div class="chatbot-header">
+                <span>DisasterX Assistant</span>
+                <button class="chatbot-close-btn" id="chatClose">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="chatbot-body" id="chatBody">
+                <div class="bot-message">👋 Hi! I’m here to help with disaster info. Ask me anything.</div>
+            </div>
+            <div class="chatbot-footer">
+                <input type="text" id="chatInput" placeholder="Type your message..." />
+                <button id="chatSend"><i class="bi bi-send"></i></button>
+            </div>
+        </div>
+    </div>
+
+ 
+
+    <footer class="footer py-5 mt-auto">
+        <div class="container">
+            <div class="footer-content d-flex">
+                <div class="footer-section">
+                    <h5>About DisasterX</h5>
+                    <p>DisasterX is a real-time disaster management dashboard that empowers communities, responders, and authorities with live updates, analytics, and resource tracking during emergencies.</p>
+                </div>
+                <div class="footer-section">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Live HeatMap</a></li>
+                        <li><a href="#">Weather Forecast</a></li>
+                        <li><a href="#">Resource Tools</a></li>
+                        <li><a href="#">Simulation</a></li>
+                        <li><a href="#">Community</a></li>
+                        <li><a href="#">Earthquake Prediction</a></li>
+                        <li><a href="#">Flood Prediction</a></li>
+                        <li><a href="#">Cyclone Prediction</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h5>Contact Us</h5>
+                    <p>Email: support@disasterx.org</p>
+                    <p>Phone: +1 (800) 123-4567</p>
+                    <p>Location: Innovation Hub, India</p>
+                </div>
+                <div class="footer-section">
+                    <h5>Follow Us</h5>
+                    <div class="social-icons d-flex gap-3">
+                        <a href="#"><i class="bi bi-facebook"></i></a>
+                        <a href="#"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#"><i class="bi bi-instagram"></i></a>
+                        <a href="#"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <small class="text-muted">&copy; 2025 DisasterX. All rights reserved.</small>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

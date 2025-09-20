@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Disaster Drills & Simulations</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+
+    </head>
+        <!-- Make popup overlay safe if it exists globally -->
+        <style>.popup-overlay{top:0;left:0;width:100%;height:100%;}</style>
+    </head>
+<body>
+  <!-- Navigation -->
+
+
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <img src="assets/imgs/your-logo.png" alt="">
+    </div>
+    <a href="#"><i class="bi bi-map"></i> Live HeatMap / Field</a>
+    <a href="weather.html"><i class="bi bi-cloud-sun"></i> Weather Forecast</a>
+    <a href="incident.html"><i class="bi bi-graph-up"></i> Incident Report</a>
+    <a href="#"><i class="bi bi-box"></i> Resource Visualization</a>
+    <a href="family.html"><i class="bi bi-people"></i> Family Identification Tool</a>
+    <a class="active" href="#"><i class="bi bi-play-circle"></i> Simulation</a>
+    <a href="#"><i class="bi bi-chat-dots"></i> Community</a>
+    <a href="Profile.html"><i class="bi bi-phone"></i> USER MOBILE</a>
+    <a href="earthquake.html"><i class="bi bi-bricks"></i> Earthquake Prediction</a>
+   
+
+
+  </div>
+
+  <!-- Overlay -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light custom-navbar py-3">
+    <div class="container-fluid">
+
+      <!-- Left: Sidebar Toggle + Dashboard -->
+      <div class="d-flex align-items-center">
+        <button class="btn toggle-btn me-2" id="toggleSidebar" aria-label="Toggle sidebar" aria-controls="sidebar"
+          aria-expanded="false">
+          <i class="bi bi-list fs-4"></i>
+        </button>
+        <h1 class=" fw-bold mb-0 dashboard-title">DASHBOARD</h1>
+      </div>
+
+      <!-- Center: DisasterX Branding -->
+      <div class="mx-auto text-center">
+        <span class="brand-name">Disaster<span class="brand-highlight">X</span></span>
+      </div>
+
+      <!-- Right: Live Monitoring + Buttons -->
+      <div class="d-flex align-items-center gap-3 ms-auto">
+        <small class="text-muted live-text">Live &middot; Monitoring</small>
+        <a href="login.html" class="btn custom-btn-outline">Log In</a>
+        <a href="signup.html" class="btn custom-btn">Sign Up</a>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <h1 class="display-4 fw-bold mb-4">Disaster Drills & Simulations</h1>
+      <p class="lead mb-4">Practice today, stay safe tomorrow. Learn, simulate, and prepare for emergencies.</p>
+      <a href="#schedule" class="btn btn-primary btn-lg">Schedule a Drill <i class="ms-2 fas fa-arrow-right"></i></a>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="py-4">
+    <div class="container">
+      <div class="row text-center">
+        <div class="col-md-3 col-6 mb-4">
+          <div class="stat-number">95%</div>
+          <div class="stat-label">More Prepared</div>
+        </div>
+        <div class="col-md-3 col-6 mb-4">
+          <div class="stat-number">10K+</div>
+          <div class="stat-label">Drills Conducted</div>
+        </div>
+        <div class="col-md-3 col-6 mb-4">
+          <div class="stat-number">24/7</div>
+          <div class="stat-label">Support</div>
+        </div>
+        <div class="col-md-3 col-6 mb-4">
+          <div class="stat-number">100+</div>
+          <div class="stat-label">Communities</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Drill Types -->
+  <section id="drills" class="py-5">
+    <div class="container">
+      <h2 class="section-title">Types of Drills</h2>
+      <div class="row g-4" id="drill-cards"></div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section">
+    <div class="container">
+      <h2 class="section-title">Why Choose Our Drills?</h2>
+      <div class="row text-center">
+        <div class="col-md-4 mb-4">
+          <div class="feature-icon"><i class="fas fa-user-shield"></i></div>
+          <h4>Expert Guidance</h4>
+          <p>Learn from certified disaster management professionals with years of experience.</p>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="feature-icon"><i class="fas fa-hands-helping"></i></div>
+          <h4>Hands-on Training</h4>
+          <p>Practice real-life scenarios in a controlled, safe environment.</p>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="feature-icon"><i class="fas fa-tools"></i></div>
+          <h4>Custom Solutions</h4>
+          <p>Tailored drills based on your location-specific risks and needs.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+
+  <!-- Schedule a Drill Form -->
+  <section id="schedule" class="schedule-section">
+    <div class="container">
+      <h2 class="section-title">Schedule a Drill</h2>
+      <p class="text-center mb-5">Fill out the form below to schedule a disaster drill for your community, school, or
+        organization.</p>
+
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <form id="drillForm" class="needs-validation" novalidate>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="name" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="name" required>
+                <div class="invalid-feedback">Please provide your name.</div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="email" required>
+                <div class="invalid-feedback">Please provide a valid email.</div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="phone" class="form-label">Phone Number</label>
+                <input type="tel" class="form-control" id="phone">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="organization" class="form-label">Organization</label>
+                <input type="text" class="form-control" id="organization" required>
+                <div class="invalid-feedback">Please provide your organization name.</div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="drillType" class="form-label">Drill Type</label>
+                <select class="form-select" id="drillType" required>
+                  <option value="">Choose...</option>
+                  <option value="earthquake">Earthquake Drill</option>
+                  <option value="tsunami">Tsunami Drill</option>
+                  <option value="flood">Flood Simulation</option>
+                  <option value="fire">Forest Fire Drill</option>
+                  <option value="cyclone">Cyclone Drill</option>
+                  <option value="landslide">Landslide Drill</option>
+                  <option value="custom">Custom Package</option>
+                </select>
+                <div class="invalid-feedback">Please select a drill type.</div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="participants" class="form-label">Number of Participants</label>
+                <input type="number" class="form-control" id="participants" min="1" required>
+                <div class="invalid-feedback">Please provide the number of participants.</div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="date" class="form-label">Preferred Date</label>
+                <input type="date" class="form-control" id="date" required>
+                <div class="invalid-feedback">Please select a date.</div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="time" class="form-label">Preferred Time</label>
+                <input type="time" class="form-control" id="time" required>
+                <div class="invalid-feedback">Please select a time.</div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="location" class="form-label">Location Address</label>
+              <textarea class="form-control" id="location" rows="2" required></textarea>
+              <div class="invalid-feedback">Please provide the location address.</div>
+            </div>
+
+            <div class="mb-3">
+              <label for="notes" class="form-label">Additional Notes</label>
+              <textarea class="form-control" id="notes" rows="3"></textarea>
+            </div>
+
+            <div class="text-center mt-4">
+              <button type="submit" class="btn btn-schedule">Submit Request</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section class="py-5">
+    <div class="container">
+      <h2 class="section-title">What People Say</h2>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="testimonial-card">
+            <div class="testimonial-text">"The earthquake drill was incredibly realistic and informative. Our team now
+              feels much more prepared for emergencies."</div>
+            <div class="testimonial-author">- Sarah Johnson, School Principal</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="testimonial-card">
+            <div class="testimonial-text">"Professional, thorough, and highly engaging. The flood simulation was exactly
+              what our coastal community needed."</div>
+            <div class="testimonial-author">- Michael Chen, Community Manager</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="testimonial-card">
+            <div class="testimonial-text">"The forest fire evacuation drill was eye-opening. We've since updated our
+              emergency protocols based on their recommendations."</div>
+            <div class="testimonial-author">- Lisa Rodriguez, Office Director</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Resources -->
+  <section id="resources-section" class="resources-section py-5">
+    <div class="resources-wrapper">
+      <h2 class="section-title">Resources</h2>
+      <div class="resources-card">
+        <ul class="resources-tabs" id="resourceTabs" role="tablist">
+          <li><button class="resources-tab active" id="earthquake-tab" data-bs-toggle="tab"
+              data-bs-target="#earthquakeRes" type="button">🌍 Earthquake</button></li>
+          <li><button class="resources-tab" id="tsunami-tab" data-bs-toggle="tab" data-bs-target="#tsunamiRes"
+              type="button">🌊 Tsunami</button></li>
+          <li><button class="resources-tab" id="flood-tab" data-bs-toggle="tab" data-bs-target="#floodRes"
+              type="button">💧 Flood</button></li>
+          <li><button class="resources-tab" id="fire-tab" data-bs-toggle="tab" data-bs-target="#fireRes"
+              type="button">🔥 Forest Fire</button></li>
+          <li><button class="resources-tab" id="cyclone-tab" data-bs-toggle="tab" data-bs-target="#cycloneRes"
+              type="button">🌪️ Cyclone</button></li>
+          <li><button class="resources-tab" id="landslide-tab" data-bs-toggle="tab" data-bs-target="#landslideRes"
+              type="button">⛰️ Landslide</button></li>
+        </ul>
+
+        <div class="resources-content tab-content mt-3" id="resources-content"></div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Modals for Each Drill -->
+  <div id="modals-container"></div>
+  <!-- Chatbot Floating Button + Chat Window -->
+    <div class="chatbot-container" id="chatbot">
+        <!-- Floating Icon -->
+        <button class="chatbot-btn" id="chatbotToggle" aria-label="Open chatbot">
+            <i class="bi bi-robot"></i>
+
+        </button>
+
+        <!-- Chat Window -->
+        <div class="chatbot-window" id="chatWindow">
+            <div class="chatbot-header">
+                <span>DisasterX Assistant</span>
+                <button class="chatbot-close-btn" id="chatClose">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="chatbot-body" id="chatBody">
+                <div class="bot-message">👋 Hi! I’m here to help with disaster info. Ask me anything.</div>
+            </div>
+            <div class="chatbot-footer">
+                <input type="text" id="chatInput" placeholder="Type your message..." />
+                <button id="chatSend"><i class="bi bi-send"></i></button>
+            </div>
+        </div>
+    </div>
+
+  <!-- Enhanced Footer -->
+  <footer class="footer py-5 mt-auto">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-md-4">
+          <h5>About DisasterX</h5>
+          <p>DisasterX is a real-time disaster management dashboard that empowers communities, responders, and
+            authorities with live updates, analytics, and resource tracking during emergencies.</p>
+        </div>
+        <div class="col-md-2">
+          <h5>Quick Links</h5>
+          <ul class="list-unstyled">
+            <li><a href="#">Live HeatMap</a></li>
+            <li><a href="#">Weather Forecast</a></li>
+            <li><a href="#">Resource Tools</a></li>
+            <li><a href="#">Simulation</a></li>
+            <li><a href="#">Community</a></li>
+            <li><a href="#">Earthquake Prediction</a></li>
+            <li><a href="#">Flood Prediction</a></li>
+            <li><a href="#">Cyclone Prediction</a></li>
+          </ul>
+        </div>
+        <div class="col-md-3">
+          <h5>Contact Us</h5>
+          <p>Email: support@disasterx.org</p>
+          <p>Phone: +1 (800) 123-4567</p>
+          <p>Location: Innovation Hub, India</p>
+        </div>
+        <div class="col-md-3">
+          <h5>Follow Us</h5>
+          <div class="social-icons d-flex gap-3">
+            <a href="#"><i class="bi bi-facebook"></i></a>
+            <a href="#"><i class="bi bi-twitter-x"></i></a>
+            <a href="#"><i class="bi bi-instagram"></i></a>
+            <a href="#"><i class="bi bi-linkedin"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="text-center mt-4">
+        <small class="text-muted">&copy; 2025 DisasterX. All rights reserved.</small>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <!-- Your script -->
+  <script src="script.js"></script>
+  <script>
+    // Sidebar toggle
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const toggleBtn = document.getElementById('toggleSidebar');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+      overlay.classList.toggle('active');
+    });
+    overlay.addEventListener('click', () => {
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
+    });
+
+  </script>
+</body>
+
+</html>
