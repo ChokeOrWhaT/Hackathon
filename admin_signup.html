@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Sign Up - DisasterX</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .custom-primary {
+            color: #1e293b;
+            font-size: 0.9rem;
+        }
+        .custom-secondary {
+            color: #64748b;
+        }
+        .bg-accent {
+            background-color: #f97316;
+            color: white;
+        }
+        .bg-accent:hover {
+            background-color: #ea580c;
+            color: white;
+        }
+        .card {
+            border-radius: 16px;
+            border: none;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+        .form-control,
+        .input-group-text {
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        .brand {
+            text-align: center;
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #f97316;
+        }
+        @keyframes slideUpFade {
+            0% {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .card {
+            animation: slideUpFade 0.6s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="container d-flex justify-content-center align-items-center min-vh-100">
+        <div class="card shadow-lg p-3">
+            <div class="brand">DisasterX</div>
+            <h2 class="text-center custom-primary mb-3">Admin Sign Up</h2>
+            <form id="adminSignupForm" novalidate>
+                <div class="mb-2 position-relative">
+                    <label class="form-label custom-primary">Full Name</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-person custom-secondary"></i></span>
+                        <input type="text" class="form-control" placeholder="Full Name" required>
+                    </div>
+                </div>
+                <div class="mb-2 position-relative">
+                    <label class="form-label custom-primary">Designation</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-briefcase custom-secondary"></i></span>
+                        <input type="text" class="form-control" placeholder="Designation" required>
+                    </div>
+                </div>
+                <div class="mb-2 position-relative">
+                    <label class="form-label custom-primary">Business Email</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-envelope custom-secondary"></i></span>
+                        <input type="email" class="form-control" placeholder="Business Email" required>
+                    </div>
+                </div>
+                <div class="mb-2 position-relative">
+                    <label class="form-label custom-primary">Organization Name</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-building custom-secondary"></i></span>
+                        <input type="text" class="form-control" placeholder="Organization Name" required>
+                    </div>
+                </div>
+                <div class="mb-2 position-relative">
+                    <label class="form-label custom-primary">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-lock custom-secondary"></i></span>
+                        <input type="password" class="form-control" placeholder="Password" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn bg-accent w-100 py-2 fw-bold mb-3">Create Admin Account</button>
+            </form>
+            <p class="text-center mt-2 mb-0 custom-secondary">
+                Already have an account? <a href="admin_login.html" class="text-decoration-none" style="color:#f97316;">Admin Login</a>
+                | <a href="signup.html" class="text-decoration-none" style="color:#f97316;">User Sign Up</a>
+            </p>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Inline preventAuthAccess
+        function preventAuthAccess() {
+            const loggedInUser = localStorage.getItem('disasterx_logged_in');
+            if (loggedInUser) {
+                window.location.href = 'dashboard.html'; // Replace with your page
+            }
+        }
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSz5L6YRK2DR_mkrFgnHucp6VLgNQKYX8",
+            authDomain: "public-announcement-d58d7.firebaseapp.com",
+            projectId: "public-announcement-d58d7",
+            storageBucket: "public-announcement-d58d7.firebasestorage.app",
+            messagingSenderId: "51806474422",
+            appId: "1:51806474422:web:d3b823833bbfa994ebd617",
+            measurementId: "G-2KZ43GBMNM"
+        };
+        // Initialize Firebase
+        try {
+            firebase.initializeApp(firebaseConfig);
+        } catch (error) {
+            console.error('Firebase initialization error:', error);
+            alert('Failed to initialize Firebase. Check your configuration.');
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Prevent access if already logged in
+        preventAuthAccess();
+
+        // Handle admin signup
+        document.getElementById('adminSignupForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const name = document.querySelector('input[placeholder="Full Name"]').value.trim();
+            const designation = document.querySelector('input[placeholder="Designation"]').value.trim();
+            const business_email = document.querySelector('input[placeholder="Business Email"]').value.trim();
+            const org_name = document.querySelector('input[placeholder="Organization Name"]').value.trim();
+            const password = document.querySelector('input[type="password"]').value.trim();
+
+            if (!name || !designation || !business_email || !org_name || !password) {
+                alert('All fields are required.');
+                return;
+            }
+
+            try {
+                // Create admin user with Firebase Authentication
+                const userCredential = await auth.createUserWithEmailAndPassword(business_email, password);
+                const user = userCredential.user;
+                console.log('Admin signed up:', user.uid);
+
+                // Store admin data in Firestore admin_authentication collection
+                await db.collection('admin_authentication').add({
+                    name: name,
+                    designation: designation,
+                    business_email: business_email,
+                    org_name: org_name,
+                    userId: user.uid,
+                    role: 'admin'
+                });
+                console.log('Admin data written to admin_authentication collection');
+
+                alert('Admin account created! Please log in.');
+                window.location.href = 'admin_login.html';
+            } catch (error) {
+                console.error('Admin signup error:', error);
+                if (error.code === 'auth/email-already-in-use') {
+                    alert('This email is already registered. Please log in or use a different email.');
+                } else {
+                    alert('Admin signup failed: ' + error.message);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
