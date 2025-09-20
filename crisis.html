@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Profile</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  #settingsModal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 50;
+    overflow-y: auto;
+  }
+  .blue-btn { background: #3b82f6; color: white; }
+  .blue-btn:hover { background: #2563eb; }
+</style>
+</head>
+<body class="bg-blue-50 text-gray-800 font-sans transition-colors duration-500">
+
+<!-- HEADER -->
+<header class="bg-white shadow sticky top-0 z-10">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+    <h1 class="text-xl font-bold text-blue-800">Admin Profile</h1>
+    <button class="px-4 py-2 rounded-lg blue-btn hover:shadow-lg" onclick="alert('Logged out!')">Logout</button>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+
+<!-- PROFILE HEADER -->
+<section class="bg-white p-6 rounded-xl shadow flex flex-col md:flex-row items-center gap-6 relative">
+  <img src="https://via.placeholder.com/150" alt="Admin Photo" class="rounded-full border-4 border-blue-500 w-36 h-36 object-cover">
+  <div class="flex-1 text-center md:text-left">
+    <h2 id="adminName" class="text-3xl font-bold text-blue-800">John Doe</h2>
+    <p id="adminRole" class="text-gray-600">System Administrator</p>
+    <p id="adminEmail" class="mt-2 text-gray-500">📧 <span contenteditable="false">john.doe@email.com</span></p>
+    <p id="adminPhone" class="text-gray-500">📱 <span contenteditable="false">+91 98765 43210</span></p>
+    <p class="text-green-600 font-medium mt-1">● Online</p>
+    <button id="editProfileBtn" onclick="editProfile()" class="mt-2 px-4 py-2 rounded-lg blue-btn hover:shadow-lg">Edit Profile</button>
+    <button id="saveProfileBtn" onclick="saveProfile()" class="mt-2 px-4 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600 hidden">Save</button>
+    <button id="cancelProfileBtn" onclick="cancelProfile()" class="mt-2 px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 hidden">Cancel</button>
+  </div>
+  <button onclick="openSettings()" class="absolute top-4 right-4 text-blue-500 hover:text-blue-700 text-2xl" title="Settings">⚙</button>
+</section>
+
+<!-- ABOUT -->
+<section class="bg-white p-6 rounded-xl shadow relative">
+  <h3 class="text-lg font-semibold mb-3 flex justify-between items-center text-blue-700">
+    About
+    <div>
+      <button onclick="editAbout()" class="text-gray-500 hover:text-blue-600 text-lg mr-2" title="Edit About">✏</button>
+      <button id="saveAboutBtn" onclick="saveAbout()" class="text-green-600 text-lg hidden">💾</button>
+      <button id="cancelAboutBtn" onclick="cancelAbout()" class="text-red-600 text-lg hidden">❌</button>
+    </div>
+  </h3>
+  <p id="aboutText" class="text-gray-700 leading-relaxed">
+    Experienced administrator with a strong background in managing data systems, ensuring security compliance, and coordinating with teams. Skilled in disaster recovery planning and system resilience.
+  </p>
+</section>
+
+<!-- DISASTER DASHBOARD -->
+<section class="bg-white p-6 rounded-xl shadow relative mt-6">
+  <h3 class="text-lg font-semibold mb-4 text-blue-700 flex justify-between items-center">
+    Disaster Dashboard
+    <button onclick="refreshDashboard()" class="text-blue-600 hover:text-blue-800 text-sm px-2 py-1 border border-blue-600 rounded-lg">Refresh</button>
+  </h3>
+
+  <!-- Live Crisis Feed -->
+  <div class="mb-6">
+    <h4 class="font-semibold text-blue-600 mb-2">Live Crisis Feed</h4>
+    <div id="crisisFeed" class="space-y-2 max-h-48 overflow-y-auto border p-2 rounded-lg bg-blue-50">
+      <p>🌊 Flood reported in Mumbai, severity: High</p>
+      <p>🔥 Fire reported in Pune, severity: Medium</p>
+      <p>🌪 Cyclone approaching coastal area of Odisha</p>
+    </div>
+  </div>
+
+  <!-- Disaster Map -->
+  <div class="mb-6">
+    <h4 class="font-semibold text-blue-600 mb-2">Disaster Map</h4>
+    <div id="disasterMap" class="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center">
+      <p class="text-gray-500">Map Placeholder (Integration with Google Maps or Leaflet.js)</p>
+    </div>
+  </div>
+
+  <!-- Casualty & Missing Reports -->
+  <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-blue-100 p-4 rounded-lg shadow text-center">
+      <h5 class="font-semibold text-blue-700">Casualties</h5>
+      <p id="casualties" class="text-2xl font-bold text-red-600">25</p>
+    </div>
+    <div class="bg-blue-100 p-4 rounded-lg shadow text-center">
+      <h5 class="font-semibold text-blue-700">Injured</h5>
+      <p id="injured" class="text-2xl font-bold text-yellow-600">40</p>
+    </div>
+    <div class="bg-blue-100 p-4 rounded-lg shadow text-center">
+      <h5 class="font-semibold text-blue-700">Missing Persons</h5>
+      <p id="missing" class="text-2xl font-bold text-orange-600">10</p>
+    </div>
+  </div>
+
+  <!-- Shelter & Resource Status -->
+  <div class="mb-6">
+    <h4 class="font-semibold text-blue-600 mb-2">Shelters & Resources</h4>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-blue-50 p-4 rounded-lg shadow">
+        <h5 class="font-semibold text-blue-700">Shelter 1</h5>
+        <p>Status: <span class="text-green-600 font-medium">Available</span></p>
+        <p>Beds: 50/100</p>
+      </div>
+      <div class="bg-blue-50 p-4 rounded-lg shadow">
+        <h5 class="font-semibold text-blue-700">Shelter 2</h5>
+        <p>Status: <span class="text-red-600 font-medium">Full</span></p>
+        <p>Beds: 100/100</p>
+      </div>
+      <div class="bg-blue-50 p-4 rounded-lg shadow">
+        <h5 class="font-semibold text-blue-700">Medical Aid</h5>
+        <p>Status: <span class="text-green-600 font-medium">Available</span></p>
+        <p>Staff: 20 doctors/nurses</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Action Buttons -->
+  <div>
+    <h4 class="font-semibold text-blue-600 mb-2">Quick Actions</h4>
+    <div class="flex flex-wrap gap-4">
+      <button class="px-4 py-2 rounded-lg blue-btn hover:shadow-lg" onclick="alert('Calling Emergency Services...')">Call Emergency</button>
+      <button class="px-4 py-2 rounded-lg blue-btn hover:shadow-lg" onclick="alert('Sending Evacuation Alert...')">Send Alert</button>
+      <button class="px-4 py-2 rounded-lg blue-btn hover:shadow-lg" onclick="alert('Dispatching Rescue Teams...')">Dispatch Rescue</button>
+    </div>
+  </div>
+
+  <!-- Resource Request Management -->
+  <div class="mt-6">
+    <h4 class="font-semibold text-blue-600 mb-2">Resource Request Management</h4>
+    <div class="space-y-2 max-h-48 overflow-y-auto border p-2 rounded-lg bg-blue-50">
+      <div class="flex justify-between items-center p-2 bg-white rounded shadow">
+        <div>
+          <p><strong>Location:</strong> Mumbai</p>
+          <p><strong>Request:</strong> 50 food packs</p>
+          <p><strong>Status:</strong> Pending</p>
+        </div>
+        <div class="flex gap-2">
+          <button class="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600" onclick="alert('Approved!')">Approve</button>
+          <button class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600" onclick="alert('Declined!')">Decline</button>
+        </div>
+      </div>
+      <div class="flex justify-between items-center p-2 bg-white rounded shadow">
+        <div>
+          <p><strong>Location:</strong> Pune</p>
+          <p><strong>Request:</strong> 20 medical kits</p>
+          <p><strong>Status:</strong> Pending</p>
+        </div>
+        <div class="flex gap-2">
+          <button class="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600" onclick="alert('Approved!')">Approve</button>
+          <button class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600" onclick="alert('Declined!')">Decline</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Disaster Statistics Dashboard -->
+  <div class="mt-6">
+    <h4 class="font-semibold text-blue-600 mb-2">Disaster Statistics</h4>
+    <div class="bg-white p-4 rounded-lg shadow">
+      <canvas id="disasterChart" class="w-full h-64"></canvas>
+    </div>
+  </div>
+
+  <!-- Recent Activity Timeline -->
+  <div class="mt-6">
+    <h4 class="font-semibold text-blue-600 mb-2">Recent Activity Timeline</h4>
+    <div class="space-y-4 max-h-48 overflow-y-auto border p-2 rounded-lg bg-blue-50">
+      <div class="p-2 bg-white rounded shadow">
+        <p><strong>Action:</strong> Approved resource request for Mumbai</p>
+        <p><strong>Time:</strong> 2 hrs ago</p>
+      </div>
+      <div class="p-2 bg-white rounded shadow">
+        <p><strong>Action:</strong> Sent evacuation alert for Odisha</p>
+        <p><strong>Time:</strong> 5 hrs ago</p>
+      </div>
+      <div class="p-2 bg-white rounded shadow">
+        <p><strong>Action:</strong> Dispatched rescue team to Pune</p>
+        <p><strong>Time:</strong> Yesterday</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ADMIN TOOLS -->
+<section class="bg-white p-6 rounded-xl shadow relative mt-6">
+  <h3 class="text-lg font-semibold mb-4 text-blue-700 flex justify-between items-center">
+    Admin Tools
+    <button onclick="refreshAdminTools()" class="text-blue-600 hover:text-blue-800 text-sm px-2 py-1 border border-blue-600 rounded-lg">Refresh</button>
+  </h3>
+
+  <!-- User Management -->
+  <div class="mb-6">
+    <h4 class="font-semibold text-blue-600 mb-2">User Management</h4>
+    <div class="space-y-2 max-h-48 overflow-y-auto border p-2 rounded-lg bg-blue-50">
+      <div class="flex justify-between items-center p-2 bg-white rounded shadow">
+        <div>
+          <p><strong>Name:</strong> Jane Smith</p>
+          <p><strong>Role:</strong> Volunteer</p>
+          <p><strong>Status:</strong> Active</p>
+        </div>
+        <div class="flex gap-2">
+          <button class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600" onclick="alert('User permissions updated!')">Edit</button>
+          <button class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600" onclick="alert('User removed!')">Remove</button>
+        </div>
+      </div>
+      <div class="flex justify-between items-center p-2 bg-white rounded shadow">
+        <div>
+          <p><strong>Name:</strong> Alex Brown</p>
+          <p><strong>Role:</strong> Coordinator</p>
+          <p><strong>Status:</strong> Inactive</p>
+        </div>
+        <div class="flex gap-2">
+          <button class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600" onclick="alert('User permissions updated!')">Edit</button>
+          <button class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600" onclick="alert('User removed!')">Remove</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alert Management -->
+  <div class="mb-6">
+    <h4 class="font-semibold text-blue-600 mb-2">Alert Management</h4>
+    <div class="flex flex-wrap gap-4">
+      <button class="px-4 py-2 rounded-lg blue-btn hover:shadow-lg" onclick="alert('Creating new alert...')">Create New Alert</button>
+      <button class="px-4 py-2 rounded-lg blue-btn hover:shadow-lg" onclick="alert('Viewing all alerts...')">View All Alerts</button>
+    </div>
+  </div>
+
+  <!-- Report Generation -->
+  <div class="mb-6">
+    <h4 class="font-semibold text-blue-600 mb-2">Report Generation</h4>
+    <div class="flex flex-wrap gap-4">
+      <button class="px-4 py-2 rounded-lg blue-btn hover:shadow-lg" onclick="alert('Generating disaster report...')">Generate Disaster Report</button>
+      <button class="px-4 py-2 rounded-lg blue-btn hover:shadow-lg" onclick="alert('Generating resource report...')">Generate Resource Report</button>
+    </div>
+  </div>
+</section>
+
+<!-- SETTINGS MODAL -->
+<div id="settingsModal">
+  <div class="bg-white rounded-xl shadow-lg max-w-4xl mx-auto my-16 p-6 relative">
+    <button onclick="closeSettings()" class="absolute top-4 right-4 text-gray-500 text-2xl hover:text-blue-700">&times;</button>
+    <h2 class="text-2xl font-bold mb-4 text-blue-800">Settings</h2>
+
+    <!-- Personal Information -->
+    <section class="mb-4">
+      <button onclick="toggleSection('personal')" class="w-full flex justify-between items-center px-4 py-2 text-left font-semibold hover:bg-blue-50">
+        Personal Information <span id="icon-personal">+</span>
+      </button>
+      <div id="personal" class="px-4 py-2 hidden grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
+        <p><strong>Full Name:</strong> John Doe</p>
+        <p><strong>Username:</strong> admin_jd</p>
+        <p><strong>Date of Birth:</strong> 12 Jan 1985</p>
+        <p><strong>Gender:</strong> Male</p>
+        <p><strong>Location:</strong> Mumbai, India</p>
+      </div>
+    </section>
+
+    <!-- Account Settings -->
+    <section class="mb-4">
+      <button onclick="toggleSection('account')" class="w-full flex justify-between items-center px-4 py-2 text-left font-semibold hover:bg-blue-50">
+        Account Settings <span id="icon-account">+</span>
+      </button>
+      <div id="account" class="px-4 py-2 hidden space-y-3">
+        <button class="w-full px-4 py-2 rounded-lg blue-btn hover:shadow-lg" onclick="alert('Change Password clicked')">Change Password</button>
+        <button class="w-full px-4 py-2 rounded-lg blue-btn hover:shadow-lg" onclick="alert('Manage Email & Phone clicked')">Manage Email & Phone</button>
+        <button class="w-full px-4 py-2 rounded-lg blue-btn hover:shadow-lg" onclick="alert('Enable Two-Factor Authentication clicked')">Enable Two-Factor Authentication</button>
+      </div>
+    </section>
+
+    <!-- Preferences -->
+    <section class="mb-4">
+      <button onclick="toggleSection('preferences')" class="w-full flex justify-between items-center px-4 py-2 text-left font-semibold hover:bg-blue-50">
+        Preferences <span id="icon-preferences">+</span>
+      </button>
+      <div id="preferences" class="px-4 py-2 hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium">Theme</label>
+          <select id="themeSelect" class="mt-1 block w-full border-gray-300 rounded-lg" onchange="changeTheme()">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Language</label>
+          <select id="languageSelect" class="mt-1 block w-full border-gray-300 rounded-lg" onchange="changeLanguage()">
+            <option>English</option>
+            <option>हिन्दी</option>
+            <option>বাংলা</option>
+          </select>
+        </div>
+        <div class="col-span-2">
+          <label class="block text-sm font-medium">Notifications</label>
+          <div class="flex flex-wrap gap-4 mt-2">
+            <label><input type="checkbox" id="notifyEmail" checked onchange="toggleNotification('Email')"> Email</label>
+            <label><input type="checkbox" id="notifySMS" onchange="toggleNotification('SMS')"> SMS</label>
+            <label><input type="checkbox" id="notifyPush" checked onchange="toggleNotification('Push')"> Push</label>
+          </div>
+        </div>
+        <div class="col-span-2">
+          <label class="block text-sm font-medium">Disaster Alerts</label>
+          <div class="flex flex-wrap gap-4 mt-2">
+            <label><input type="checkbox" id="notifyFlood" checked onchange="toggleDisasterNotification('Flood')"> Flood</label>
+            <label><input type="checkbox" id="notifyFire" checked onchange="toggleDisasterNotification('Fire')"> Fire</label>
+            <label><input type="checkbox" id="notifyCyclone" checked onchange="toggleDisasterNotification('Cyclone')"> Cyclone</label>
+            <label><input type="checkbox" id="notifyEarthquake" checked onchange="toggleDisasterNotification('Earthquake')"> Earthquake</label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Privacy -->
+    <section class="mb-4">
+      <button onclick="toggleSection('privacy')" class="w-full flex justify-between items-center px-4 py-2 text-left font-semibold hover:bg-blue-50">
+        Privacy Settings <span id="icon-privacy">+</span>
+      </button>
+      <div id="privacy" class="px-4 py-2 hidden text-gray-700">
+        <label><input type="checkbox" id="showEmail" checked onchange="togglePrivacy('Email')"> Show Email</label>
+        <label><input type="checkbox" id="showPhone" onchange="togglePrivacy('Phone')"> Show Phone Number</label>
+        <label><input type="checkbox" id="showStatus" checked onchange="togglePrivacy('Online')"> Show Online Status</label>
+      </div>
+    </section>
+
+    <!-- Activity & Login History -->
+    <section class="mb-4">
+      <button onclick="toggleSection('history')" class="w-full flex justify-between items-center px-4 py-2 text-left font-semibold hover:bg-blue-50">
+        Activity & Login History <span id="icon-history">+</span>
+      </button>
+      <div id="history" class="px-4 py-2 hidden text-gray-700">
+        <ul class="space-y-2 text-sm">
+          <li>✅ Profile updated – 2 hrs ago</li>
+          <li>🔒 Password changed – 5 hrs ago</li>
+          <li>📧 Email linked – Yesterday</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Security Settings -->
+    <section class="mb-4">
+      <button onclick="toggleSection('security')" class="w-full flex justify-between items-center px-4 py-2 text-left font-semibold hover:bg-blue-50">
+        Security Settings <span id="icon-security">+</span>
+      </button>
+      <div id="security" class="px-4 py-2 hidden text-gray-700 space-y-2">
+        <button class="w-full px-4 py-2 rounded-lg blue-btn hover:shadow-lg" onclick="alert('View Active Sessions clicked')">View Active Sessions</button>
+        <button class="w-full px-4 py-2 rounded-lg blue-btn hover:shadow-lg" onclick="alert('Logout from All Devices clicked')">Logout from All Devices</button>
+        <button class="w-full px-4 py-2 rounded-lg blue-btn hover:shadow-lg" onclick="alert('Manage Authorized Devices clicked')">Manage Authorized Devices</button>
+      </div>
+    </section>
+
+    <!-- About / Bio -->
+    <section class="mb-4">
+      <button onclick="toggleSection('bio')" class="w-full flex justify-between items-center px-4 py-2 text-left font-semibold hover:bg-blue-50">
+        About / Bio <span id="icon-bio">+</span>
+      </button>
+      <div id="bio" class="px-4 py-2 hidden text-gray-700" contenteditable="true"></div>
+    </section>
+
+  </div>
+</div>
+
+<!-- Chart.js library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// Toggle section visibility
+function toggleSection(id) {
+  const section = document.getElementById(id);
+  const icon = document.getElementById("icon-" + id);
+  if(section.classList.contains("hidden")) { section.classList.remove("hidden"); icon.textContent="−"; }
+  else { section.classList.add("hidden"); icon.textContent="+"; }
+}
+
+// Open/close settings modal
+function openSettings(){ document.getElementById('settingsModal').style.display='block'; }
+function closeSettings(){ document.getElementById('settingsModal').style.display='none'; }
+
+// Profile edit
+let profileBackup = {};
+function editProfile(){
+  const name = document.getElementById('adminName');
+  const email = document.getElementById('adminEmail').querySelector('span');
+  const phone = document.getElementById('adminPhone').querySelector('span');
+  profileBackup = { name: name.innerText, email: email.innerText, phone: phone.innerText };
+  name.contentEditable = true;
+  email.contentEditable = true;
+  phone.contentEditable = true;
+  name.focus();
+  document.getElementById('editProfileBtn').classList.add('hidden');
+  document.getElementById('saveProfileBtn').classList.remove('hidden');
+  document.getElementById('cancelProfileBtn').classList.remove('hidden');
+}
+function saveProfile(){
+  const name = document.getElementById('adminName');
+  const email = document.getElementById('adminEmail').querySelector('span');
+  const phone = document.getElementById('adminPhone').querySelector('span');
+  name.contentEditable = false;
+  email.contentEditable = false;
+  phone.contentEditable = false;
+  document.getElementById('editProfileBtn').classList.remove('hidden');
+  document.getElementById('saveProfileBtn').classList.add('hidden');
+  document.getElementById('cancelProfileBtn').classList.add('hidden');
+  alert('Profile updated!');
+}
+function cancelProfile(){
+  const name = document.getElementById('adminName');
+  const email = document.getElementById('adminEmail').querySelector('span');
+  const phone = document.getElementById('adminPhone').querySelector('span');
+  name.innerText = profileBackup.name;
+  email.innerText = profileBackup.email;
+  phone.innerText = profileBackup.phone;
+  name.contentEditable = false;
+  email.contentEditable = false;
+  phone.contentEditable = false;
+  document.getElementById('editProfileBtn').classList.remove('hidden');
+  document.getElementById('saveProfileBtn').classList.add('hidden');
+  document.getElementById('cancelProfileBtn').classList.add('hidden');
+}
+
+// About edit
+let aboutBackup = '';
+function editAbout(){
+  const about = document.getElementById('aboutText');
+  aboutBackup = about.innerText;
+  about.contentEditable = true;
+  about.focus();
+  document.getElementById('saveAboutBtn').classList.remove('hidden');
+  document.getElementById('cancelAboutBtn').classList.remove('hidden');
+}
+function saveAbout(){
+  const about = document.getElementById('aboutText');
+  about.contentEditable = false;
+  document.getElementById('saveAboutBtn').classList.add('hidden');
+  document.getElementById('cancelAboutBtn').classList.add('hidden');
+  alert('About updated!');
+}
+function cancelAbout(){
+  const about = document.getElementById('aboutText');
+  about.innerText = aboutBackup;
+  about.contentEditable = false;
+  document.getElementById('saveAboutBtn').classList.add('hidden');
+  document.getElementById('cancelAboutBtn').classList.add('hidden');
+}
+
+// Preferences
+function changeTheme(){
+  const theme = document.getElementById('themeSelect').value;
+  document.body.className = theme==='dark' ? 'bg-gray-900 text-white font-sans transition-colors duration-500' : 'bg-blue-50 text-gray-800 font-sans transition-colors duration-500';
+}
+function changeLanguage(){ alert('Language changed to '+document.getElementById('languageSelect').value); }
+function toggleNotification(type){ alert(type + ' notifications toggled!'); }
+function toggleDisasterNotification(type){ alert(type + ' disaster notifications toggled!'); }
+function togglePrivacy(type){ alert(type + ' visibility toggled!'); }
+
+// Dashboard and tools refresh
+function refreshDashboard() { alert('Dashboard refreshed with latest disaster data!'); }
+function refreshAdminTools() { alert('Admin tools refreshed!'); }
+
+// Disaster Statistics Chart
+const ctx = document.getElementById('disasterChart').getContext('2d');
+const disasterChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['Flood', 'Fire', 'Cyclone', 'Earthquake', 'Landslide'],
+        datasets: [{
+            label: 'Number of Incidents',
+            data: [5, 3, 2, 1, 1],
+            backgroundColor: 'rgba(59,130,246,0.7)',
+            borderColor: 'rgba(37,99,235,1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: { y: { beginAtZero: true } },
+        plugins: { legend: { display: false } }
+    }
+});
+</script>
+
+</body>
+</html>
