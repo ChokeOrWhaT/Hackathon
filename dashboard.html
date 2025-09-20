@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DISASTER RESPONSE DASHBOARD</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- PATCH: ensure popup overlay spans full screen without touching your CSS file -->
+    <style>
+        .popup-overlay {
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #logoutBtn {
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="popup-overlay" id="popup" aria-hidden="true">
+        <div class="popup-card" role="dialog" aria-labelledby="popup-title" aria-modal="true">
+            <div class="popup-media" aria-hidden="true">
+                <div class="popup-content">
+                    <h2 id="popup-title">WELCOME TO THE DISASTER DASHBOARD</h2>
+                    <p>Real-time situational awareness. Latest incidents, resource allocation, and rescue progress — all
+                        in one place.</p>
+                    <p><small>Tip: You can dismiss this permanently for this browser session by clicking "Enter
+                            Dashboard".</small></p>
+                    <div class="d-flex gap-2">
+                        <button id="enterBtn" class="btn btn-primary">Enter</button>
+                        <button id="closeBtn" class="btn btn-outline-secondary">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="your-logo.png" alt="">
+        </div>
+        
+        <a href="weather.html"><i class="bi bi-cloud-sun"></i> Weather Forecast</a>
+        <a href="incident.html"><i class="bi bi-graph-up"></i> Incident Reporting</a>
+        <a href="Emergency.html"><i class="bi bi-box"></i> Emergency Services</a>
+        <a href="family.html"><i class="bi bi-people"></i> Family Identification Tool</a>
+        <a href="simulation.html"><i class="bi bi-play-circle"></i> Simulation</a>
+        <a href="#"><i class="bi bi-chat-dots"></i> Community</a>
+        <a href="Profile.html"><i class="bi bi-phone"></i> User Profile</a>
+        <a href="earthquake.html"><i class="bi bi-bricks"></i> Earthquake Prediction</a>
+     
+
+
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light custom-navbar py-3">
+        <div class="container-fluid">
+
+            <!-- Left: Sidebar Toggle + Dashboard -->
+            <div class="d-flex align-items-center">
+                <button class="btn toggle-btn me-2" id="toggleSidebar" aria-label="Toggle sidebar"
+                    aria-controls="sidebar" aria-expanded="false">
+                    <i class="bi bi-list fs-4"></i>
+                </button>
+                <h1 class=" fw-bold mb-0 dashboard-title">DASHBOARD</h1>
+            </div>
+
+            <!-- Center: DisasterX Branding -->
+            <div class="mx-auto text-center">
+                <span class="brand-name">Disaster<span class="brand-highlight">X</span></span>
+            </div>
+
+            <!-- Right: Live Monitoring + Buttons -->
+            <div class="d-flex align-items-center gap-3 ms-auto">
+                <small class="text-muted live-text">Live &middot; Monitoring</small>
+                <button class="btn Logout-btn" id="logoutBtn">Logout</button>
+            </div>
+
+        </div>
+
+
+    </nav>
+
+    <main class="container my-4">
+
+        <!-- Quick stats (8) -->
+        <section id="quick-stats" class="mb-4">
+            <div class="row g-3">
+                <div class="col-6 col-md-3">
+                    <div class="stat-card stat-card-1 p-3 d-flex flex-column align-items-start">
+                        <div class="d-flex align-items-center w-100 justify-content-between">
+                            <div>
+                                <div class="stat-value" data-target="128">0</div>
+                                <div class="stat-label">Active incidents</div>
+                            </div>
+                            <i class="bi bi-fire fs-3 text-danger"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="stat-card p-3 d-flex flex-column align-items-start">
+                        <div class="d-flex align-items-center w-100 justify-content-between">
+                            <div>
+                                <div class="stat-value" data-target="5234">0</div>
+                                <div class="stat-label">People assisted</div>
+                            </div>
+                            <i class="bi bi-people fs-3 text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="stat-card p-3 d-flex flex-column align-items-start">
+                        <div class="d-flex align-items-center w-100 justify-content-between">
+                            <div>
+                                <div class="stat-value" data-target="412">0</div>
+                                <div class="stat-label">Available resources</div>
+                            </div>
+                            <i class="bi bi-box-seam fs-3 text-success"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="stat-card p-3 d-flex flex-column align-items-start">
+                        <div class="d-flex align-items-center w-100 justify-content-between">
+                            <div>
+                                <div class="stat-value" data-target="92">0</div>
+                                <div class="stat-label">Rescue operations</div>
+                            </div>
+                            <i class="bi bi-flag fs-3 text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="stat-card p-3 d-flex flex-column align-items-start">
+                        <div class="d-flex align-items-center w-100 justify-content-between">
+                            <div>
+                                <div class="stat-value" data-target="43">0</div>
+                                <div class="stat-label">Casualties</div>
+                            </div>
+                            <i class="bi bi-heartbreak fs-3 text-muted"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="stat-card p-3 d-flex flex-column align-items-start">
+                        <div class="d-flex align-items-center w-100 justify-content-between">
+                            <div>
+                                <div class="stat-value" data-target="76">0</div>
+                                <div class="stat-label">NGO's</div>
+                            </div>
+                            <i class="bi bi-building fs-3 text-info"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="stat-card p-3 d-flex flex-column align-items-start">
+                        <div class="d-flex align-items-center w-100 justify-content-between">
+                            <div>
+                                <div class="stat-value" data-target="128">0</div>
+                                <div class="stat-label">Hospitals</div>
+                            </div>
+                            <i class="bi bi-hospital fs-3 text-danger"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <div class="stat-card p-3 d-flex flex-column align-items-start">
+                        <div class="d-flex align-items-center w-100 justify-content-between">
+                            <div>
+                                <div class="stat-value" data-target="34">0</div>
+                                <div class="stat-label">Rescue teams</div>
+                            </div>
+                            <i class="bi bi-people-fill fs-3 text-success"></i>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="charts" class="mb-4">
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="card-chart p-3 h-100">
+                        <h5>Incidents over time</h5>
+                        <canvas id="incidentsChart" height="160"></canvas>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <h6>Successful vs Rescue operations</h6>
+                    <canvas id="successChart" height="180"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Real-time news -->
+        <div class="news-swiper">
+            <div class="swiper-track">
+                <!-- Slide 1 -->
+                <a href="https://example.com/floods" target="_blank" class="swiper-slide">
+                    <img src="https://via.placeholder.com/450x250?text=Floods" alt="Floods">
+                    <div class="slide-content">
+                        <h4>Floods in Riverine District — rescue ongoing</h4>
+                        <p>Teams are evacuating affected areas.</p>
+                        <small>8/10/2025, 11:10:46 PM</small>
+                    </div>
+                </a>
+                <!-- Slide 2 -->
+                <a href="https://example.com/earthquake" target="_blank" class="swiper-slide">
+                    <img src="https://via.placeholder.com/450x250?text=Earthquake" alt="Earthquake">
+                    <div class="slide-content">
+                        <h4>Earthquake tremors reported in coastal belt</h4>
+                        <p>Aftershocks continue; monitoring in progress.</p>
+                        <small>8/10/2025, 10:10:46 PM</small>
+                    </div>
+                </a>
+                <!-- Slide 3 -->
+                <a href="https://example.com/medical" target="_blank" class="swiper-slide">
+                    <img src="https://via.placeholder.com/450x250?text=Medical+Aid" alt="Medical Camps">
+                    <div class="slide-content">
+                        <h4>Temporary medical camps set up</h4>
+                        <p>Local NGOs assisting.</p>
+                        <small>8/10/2025, 9:10:46 PM</small>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Enhanced Footer -->
+    <footer class="footer py-5 mt-auto">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <h5>About DisasterX</h5>
+                    <p>DisasterX is a real-time disaster management dashboard that empowers communities, responders, and
+                        authorities with live updates, analytics, and resource tracking during emergencies.</p>
+                </div>
+                <div class="col-md-2">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Live HeatMap</a></li>
+                        <li><a href="#">Weather Forecast</a></li>
+                        <li><a href="#">Resource Tools</a></li>
+                        <li><a href="#">Simulation</a></li>
+                        <li><a href="#">Community</a></li>
+                        <li><a href="#">Earthquake Prediction</a></li>
+                        <li><a href="#">Flood Prediction</a></li>
+                        <li><a href="#">Cyclone Prediction</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Contact Us</h5>
+                    <p>Email: support@disasterx.org</p>
+                    <p>Phone: +1 (800) 123-4567</p>
+                    <p>Location: Innovation Hub, India</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Follow Us</h5>
+                    <div class="social-icons d-flex gap-3">
+                        <a href="#"><i class="bi bi-facebook"></i></a>
+                        <a href="#"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#"><i class="bi bi-instagram"></i></a>
+                        <a href="#"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <small class="text-muted">&copy; 2025 DisasterX. All rights reserved.</small>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <script>
+  // 🚨 Protect dashboard: redirect if not logged in
+  const user = localStorage.getItem("disasterx_logged_in");
+  if (!user) {
+    window.location.href = "login.html";
+  }
+
+  // Grab refs
+  const popup = document.getElementById('popup');
+  const enterBtn = document.getElementById('enterBtn');
+  const closeBtn = document.getElementById('closeBtn');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  const toggleBtn = document.getElementById('toggleSidebar');
+  const loginBtn = document.getElementById("loginBtn");
+  const signupBtn = document.getElementById("signupBtn");
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  // Sidebar toggle
+  if (toggleBtn && sidebar && overlay) {
+    toggleBtn.addEventListener('click', () => {
+      const isActive = sidebar.classList.toggle('active');
+      overlay.classList.toggle('active');
+      toggleBtn.setAttribute('aria-expanded', String(isActive));
+    });
+
+    overlay.addEventListener('click', () => {
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
+      toggleBtn.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+  // Popup helpers
+  function hidePopup(perList = true) {
+    if (!popup) return;
+    popup.style.display = 'none';
+    popup.setAttribute('aria-hidden', 'true');
+    if (perList) sessionStorage.setItem('respondr_seen_popup', '1');
+  }
+  if (sessionStorage.getItem('respondr_seen_popup')) hidePopup(false);
+
+  enterBtn?.addEventListener('click', () => hidePopup(true));
+  closeBtn?.addEventListener('click', () => hidePopup(false));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hidePopup(false); });
+
+  // Animated counters
+  const counters = document.querySelectorAll('.stat-value');
+  const counterObserver = new IntersectionObserver((entries, obs) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        animateCounter(entry.target);
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.6 });
+
+  counters.forEach(c => counterObserver.observe(c));
+
+  function animateCounter(el) {
+    const target = +el.getAttribute('data-target');
+    const duration = 1200;
+    let start = null;
+    function step(ts) {
+      if (!start) start = ts;
+      const progress = Math.min((ts - start) / duration, 1);
+      el.textContent = Math.floor(progress * target).toLocaleString();
+      if (progress < 1) requestAnimationFrame(step);
+      else el.textContent = target.toLocaleString();
+    }
+    requestAnimationFrame(step);
+  }
+
+  // Charts
+  const incidentsCtx = document.getElementById('incidentsChart')?.getContext('2d');
+  const successCtx = document.getElementById('successChart')?.getContext('2d');
+
+  const hours = Array.from({ length: 12 }).map((_, i) => `${i + 1}h`);
+  const incidentsData = Array.from({ length: 12 }).map(() => Math.floor(Math.random() * 30) + 5);
+
+  const incidentsChart = incidentsCtx ? new Chart(incidentsCtx, {
+    type: 'line',
+    data: {
+      labels: hours,
+      datasets: [{
+        label: 'Active incidents',
+        data: incidentsData,
+        fill: true,
+        tension: 0.3,
+        borderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: true } },
+      scales: { y: { beginAtZero: true } }
+    }
+  }) : null;
+
+  const successChart = successCtx ? new Chart(successCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Successful', 'Pending/Failed'],
+      datasets: [{ data: [72, 28], hoverOffset: 6 }]
+    },
+    options: { responsive: true }
+  }) : null;
+
+  // Real-time updates
+  function simulateRealtimeUpdate() {
+    document.querySelectorAll('.stat-value').forEach(el => {
+      const base = +el.getAttribute('data-target');
+      const jitter = Math.floor((Math.random() - 0.4) * Math.max(1, base * 0.05));
+      const newVal = Math.max(0, base + jitter);
+      el.setAttribute('data-target', newVal);
+      el.textContent = newVal.toLocaleString();
+    });
+
+    if (incidentsChart) {
+      const newPoint = Math.floor(Math.random() * 35) + 2;
+      const lastLabel = incidentsChart.data.labels.slice(-1)[0];
+      const nextHour = parseInt(lastLabel.replace('h', '')) + 1;
+      incidentsChart.data.labels.push(`${nextHour}h`);
+      incidentsChart.data.datasets[0].data.push(newPoint);
+      if (incidentsChart.data.labels.length > 24) {
+        incidentsChart.data.labels.shift();
+        incidentsChart.data.datasets[0].data.shift();
+      }
+      incidentsChart.update();
+    }
+
+    if (successChart) {
+      const succ = Math.max(0, Math.min(100,
+        successChart.data.datasets[0].data[0] +
+        Math.floor((Math.random() - 0.5) * 6)
+      ));
+      successChart.data.datasets[0].data[0] = succ;
+      successChart.data.datasets[0].data[1] = 100 - succ;
+      successChart.update();
+    }
+  }
+  setInterval(simulateRealtimeUpdate, 8000);
+
+  // Trigger counter animations on load
+  window.addEventListener('load', () => {
+    document.querySelectorAll('.stat-value').forEach(el => {
+      if (el.textContent === '0') animateCounter(el);
+    });
+  });
+
+  // Simple swiper (carousel)
+  let index = 0;
+  const slides = document.querySelectorAll('.swiper-slide');
+  const track = document.querySelector('.swiper-track');
+  const total = slides.length;
+
+  function nextSlide() {
+    index++;
+    if (index >= total) index = 0;
+    if (track) {
+      track.style.transform = `translateX(-${index * 100}%)`;
+    }
+  }
+
+  let sliderInterval = setInterval(nextSlide, 3000);
+  const swiper = document.querySelector('.news-swiper');
+  if (swiper) {
+    swiper.addEventListener('mouseenter', () => clearInterval(sliderInterval));
+    swiper.addEventListener('mouseleave', () => sliderInterval = setInterval(nextSlide, 3000));
+  }
+
+  // Keyboard navigation for slides
+  document.addEventListener('keydown', (e) => {
+    if (!['ArrowLeft', 'ArrowRight'].includes(e.key)) return;
+    if (e.key === 'ArrowRight') nextSlide();
+    if (e.key === 'ArrowLeft') {
+      index = (index - 1 + total) % total;
+      if (track) {
+        track.style.transform = `translateX(-${index * 100}%)`;
+      }
+    }
+  });
+
+  // ✅ Auth check for buttons
+  function checkAuth() {
+    const user = localStorage.getItem("disasterx_logged_in");
+    if (user) {
+      loginBtn?.classList.add("d-none");
+      signupBtn?.classList.add("d-none");
+      logoutBtn?.classList.remove("d-none");
+    } else {
+      loginBtn?.classList.remove("d-none");
+      signupBtn?.classList.remove("d-none");
+      logoutBtn?.classList.add("d-none");
+    }
+  }
+
+  logoutBtn?.addEventListener("click", () => {
+    localStorage.removeItem("disasterx_logged_in");
+    sessionStorage.clear();
+    window.location.replace("login.html");
+  });
+
+  // Run once on load
+  checkAuth();
+
+  // Dashboard data fetching
+  fetch("/api/dashboard")
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("title").textContent = data.title;
+      document.getElementById("message").textContent = data.message;
+    })
+    .catch(err => console.error("Dashboard fetch failed:", err));
+</script>
+
+
+</body>
+
+</html>
