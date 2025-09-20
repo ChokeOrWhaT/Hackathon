@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DisasterX · Flood Prediction</title>
+
+  <!-- Core libs -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+
+  <!-- Your global styles -->
+  <link rel="stylesheet" href="style.css"/>
+
+  <!-- Tiny patch for popup overlay (kept from your head block) -->
+  <style>
+    .popup-overlay { top:0; left:0; width:100%; height:100%; }
+  </style>
+</head>
+<body class="flood-page">
+
+  <!-- ===== SIDEBAR (unchanged) ===== -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <img src="your-logo.png" alt="">
+    </div>
+    <a href="#"><i class="bi bi-map"></i> Live HeatMap / Field</a>
+    <a href="weather.html"><i class="bi bi-cloud-sun"></i> Weather Forecast</a>
+    <a href="incident.html"><i class="bi bi-graph-up"></i> Incident Reporting</a>
+    <a href="#"><i class="bi bi-box"></i> Resource Visualization</a>
+    <a href="family.html"><i class="bi bi-people"></i> Family Identification Tool</a>
+    <a href="simulation.html"><i class="bi bi-play-circle"></i> Simulation</a>
+    <a href="#"><i class="bi bi-chat-dots"></i> Community</a>
+    <a href="Profile.html"><i class="bi bi-phone"></i> User Profile</a>
+    <a href="earthquake.html"><i class="bi bi-bricks"></i> Earthquake Prediction</a>
+    <a href="flood.html" class="active"><i class="bi bi-tsunami"></i> Flood Prediction</a>
+    <a href="cyclone_page.html"><i class="bi bi-wind"></i> Cyclone Prediction</a>
+  </div>
+
+  <!-- Overlay -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- ===== NAVBAR (unchanged markup) ===== -->
+  <nav class="navbar navbar-expand-lg navbar-light custom-navbar py-3">
+    <div class="container-fluid">
+      <div class="d-flex align-items-center">
+        <button class="btn toggle-btn me-2" id="toggleSidebar"
+                aria-label="Toggle sidebar" aria-controls="sidebar" aria-expanded="false">
+          <i class="bi bi-list fs-4"></i>
+        </button>
+        <h1 class="fw-bold mb-0 dashboard-title">DASHBOARD</h1>
+      </div>
+
+      <div class="mx-auto text-center">
+        <span class="brand-name">Disaster<span class="brand-highlight">X</span></span>
+      </div>
+
+      <div class="d-flex align-items-center gap-3 ms-auto">
+        <small class="text-muted live-text">Live &middot; Monitoring</small>
+        <a href="login.html" class="btn custom-btn-outline">Log In</a>
+        <a href="signup.html" class="btn custom-btn">Sign Up</a>
+      </div>
+    </div>
+  </nav>
+
+
+<!-- ===== FLOOD HERO ===== -->
+<section class="flood-hero position-relative overflow-hidden">
+  <div class="flood-hero-bg" aria-hidden="true"></div>
+  <div class="container position-relative">
+    <div class="row align-items-center">
+      <!-- Copy/CTA -->
+      <div class="col-lg-7">
+        <div class="flood-hero-copy reveal">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-tsunami fs-3 text-primary"></i>
+            <span class="flood-chip">Flood Prediction (Experimental)</span>
+          </div>
+          <h1 class="flood-hero-title mb-3">
+            Understand flood risks with<br>
+            <span class="brand-accent">Disaster</span>X modeling
+          </h1>
+          <p class="flood-hero-sub mb-4">
+            Assess potential flood impact using rainfall data, watershed history, and predictive hydrology.<br/>
+            Designed for emergency teams, planners, and local communities.
+          </p>
+          <div class="d-flex flex-wrap gap-3">
+            <a href="#flood-predictor" class="btn flood-cta">Start Prediction</a>
+            <a href="#how-it-works" class="btn flood-ghost">How it works</a>
+          </div>
+        </div>
+      </div>
+      <!-- Stats -->
+      <div class="col-lg-5 mt-5 mt-lg-0">
+        <div class="flood-stats reveal">
+          <div class="flood-stat">
+            <i class="bi bi-droplet-half"></i>
+            <div>
+              <div class="flood-stat-label">Rainfall past 24h</div>
+              <div class="flood-stat-value" data-target="320">0</div>
+            </div>
+          </div>
+          <div class="flood-stat">
+            <i class="bi bi-geo-alt"></i>
+            <div>
+              <div class="flood-stat-label">Alerts in your region</div>
+              <div class="flood-stat-value" data-target="5">0</div>
+            </div>
+          </div>
+          <div class="flood-stat">
+            <i class="bi bi-graph-up"></i>
+            <div>
+              <div class="flood-stat-label">Forecast updates (hrs)</div>
+              <div class="flood-stat-value" data-target="6">0</div>
+            </div>
+          </div>
+          <small class="text-muted">* Demo numbers for UI preview</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <!-- ===== HOW IT WORKS ===== -->
+  <section class="section-pad" id="how-it-works">
+    <div class="container">
+      <div class="text-center mb-5 reveal">
+        <h2 class="fw-bold section-title">How this predictor works</h2>
+        <p class="text-muted mb-0">Designed to mirror your <code>flood.py</code> pipeline (Random Forest + real-time weather + engineered features).</p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-3 reveal">
+          <div class="card h-100 card-glass">
+            <div class="card-body">
+              <div class="icon-circle mb-3"><i class="bi bi-cloud-rain"></i></div>
+              <h5 class="fw-semibold mb-2">Weather Snapshot</h5>
+              <p class="text-muted mb-0">
+                Incorporates precipitation, temperature, and humidity (Visual Crossing API in your Python code).
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3 reveal">
+          <div class="card h-100 card-glass">
+            <div class="card-body">
+              <div class="icon-circle mb-3"><i class="bi bi-droplet-half"></i></div>
+              <h5 class="fw-semibold mb-2">Hydro Inputs</h5>
+              <p class="text-muted mb-0">
+                Includes river discharge & water level with elevation & land/soil encodings for terrain response.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3 reveal">
+          <div class="card h-100 card-glass">
+            <div class="card-body">
+              <div class="icon-circle mb-3"><i class="bi bi-diagram-3"></i></div>
+              <h5 class="fw-semibold mb-2">Random Forest</h5>
+              <p class="text-muted mb-0">
+                Learns non-linear interactions across features using your trained RandomForestClassifier.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3 reveal">
+          <div class="card h-100 card-glass">
+            <div class="card-body">
+              <div class="icon-circle mb-3"><i class="bi bi-activity"></i></div>
+              <h5 class="fw-semibold mb-2">Result & Probability</h5>
+              <p class="text-muted mb-0">
+                Returns “Flood Likely/Unlikely” with probability. Accuracy depends on data coverage & quality.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-info mt-4 rounded-3 shadow-sm reveal">
+        <strong>Note:</strong> This page is a <em>UI demo</em>. Predictions shown here are illustrative only. When you plug in your Python service, the UI will display live model outcomes.
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PREDICTOR FORM (DEMO) ===== -->
+  <section class="section-pad bg-section" id="flood-predictor">
+    <div class="container">
+      <div class="row align-items-start g-4">
+        <div class="col-lg-7 reveal">
+          <div class="card shadow-lg border-0 flood-form-card">
+            <div class="card-body p-4 p-md-5">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <h3 class="fw-bold mb-0">Check Flood Risk</h3>
+                <span class="badge bg-primary-subtle text-primary d-inline-flex align-items-center">
+                  <i class="bi bi-gear-wide-connected me-1"></i> Demo Mode
+                </span>
+              </div>
+              <form id="uiFloodForm" novalidate>
+                <div class="row g-3">
+                  <div class="col-6">
+                    <label class="form-label">Latitude (8–37°N)</label>
+                    <input type="number" step="0.0001" class="form-control form-control-lg" id="lat" placeholder="e.g., 30.0668" required>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label">Longitude (68–97°E)</label>
+                    <input type="number" step="0.0001" class="form-control form-control-lg" id="lon" placeholder="e.g., 79.0193" required>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label">River Discharge (m³/s)</label>
+                    <input type="number" class="form-control" id="discharge" placeholder="e.g., 3000">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Water Level (m)</label>
+                    <input type="number" class="form-control" id="water" placeholder="e.g., 5">
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label">Elevation (m)</label>
+                    <input type="number" class="form-control" id="elevation" placeholder="e.g., 1600">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Population Density</label>
+                    <input type="number" class="form-control" id="density" placeholder="e.g., 200">
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label">Land Cover</label>
+                    <select class="form-select" id="land">
+                      <option selected>Forest</option>
+                      <option>Urban</option>
+                      <option>Agriculture</option>
+                      <option>Grassland</option>
+                      <option>Water</option>
+                      <option>Barren</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Soil Type</label>
+                    <select class="form-select" id="soil">
+                      <option selected>Loam</option>
+                      <option>Clay</option>
+                      <option>Sand</option>
+                      <option>Silt</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="form-check mt-2">
+                      <input class="form-check-input" type="checkbox" id="infra">
+                      <label class="form-check-label" for="infra">Critical infrastructure nearby</label>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-check mt-2">
+                      <input class="form-check-input" type="checkbox" id="history" checked>
+                      <label class="form-check-label" for="history">Past floods reported</label>
+                    </div>
+                  </div>
+
+                  <div class="col-12 d-flex gap-2 mt-2">
+                    <button type="submit" class="btn custom-btn px-4">
+                      <i class="bi bi-droplet"></i> Compute (Demo)
+                    </button>
+                    <button type="reset" class="btn custom-btn-outline px-4">
+                      <i class="bi bi-arrow-counterclockwise"></i> Reset
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Result panel -->
+        <div class="col-lg-5 reveal">
+          <div class="card shadow-lg border-0 result-card">
+            <div class="card-body p-4">
+              <div class="d-flex align-items-center justify-content-between">
+                <h4 class="fw-bold mb-0">Result</h4>
+                <span class="text-muted small">Illustrative only</span>
+              </div>
+              <div class="risk-meter mt-4">
+                <div class="risk-bar">
+                  <div class="risk-fill" id="riskFill" style="--p:0%"></div>
+                </div>
+                <div class="d-flex justify-content-between mt-2">
+                  <small class="text-muted">Low</small>
+                  <small class="text-muted">High</small>
+                </div>
+              </div>
+              <div class="display-5 fw-bold mt-3"><span id="riskPct">0</span>%</div>
+              <div class="badge mt-2" id="riskBadge">Awaiting input</div>
+
+              <div class="mt-4 text-muted small" id="resultTips" aria-live="polite">
+                Provide location & context to view a demo probability. In production this will show live model output from your Python service.
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- row -->
+    </div>
+  </section>
+
+  <!-- ===== PREPAREDNESS ===== -->
+  <section class="section-pad" id="preparedness">
+    <div class="container">
+      <div class="text-center mb-5 reveal">
+        <h2 class="fw-bold section-title">Flood Preparedness — Quick Measures</h2>
+        <p class="text-muted mb-0">Short, practical tips to reduce risk before, during, and after floods.</p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-4 reveal">
+          <div class="card h-100 tip-card">
+            <div class="card-body">
+              <div class="tip-icon"><i class="bi bi-broadcast-pin"></i></div>
+              <h5 class="fw-semibold">Alerts & Evacuation</h5>
+              <p class="text-muted mb-0">Follow official advisories, have a go-bag ready, and know your nearest elevated/safer route and shelter.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4 reveal">
+          <div class="card h-100 tip-card">
+            <div class="card-body">
+              <div class="tip-icon"><i class="bi bi-lightning"></i></div>
+              <h5 class="fw-semibold">Power & Appliances</h5>
+              <p class="text-muted mb-0">Switch off mains if instructed; move electricals & valuables above likely water levels.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4 reveal">
+          <div class="card h-100 tip-card">
+            <div class="card-body">
+              <div class="tip-icon"><i class="bi bi-droplet"></i></div>
+              <h5 class="fw-semibold">Water Safety</h5>
+              <p class="text-muted mb-0">Avoid walking/driving through floodwaters; they hide currents, sinkholes, and open drains.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4 reveal">
+          <div class="card h-100 tip-card">
+            <div class="card-body">
+              <div class="tip-icon"><i class="bi bi-house-check"></i></div>
+              <h5 class="fw-semibold">Home Prep</h5>
+              <p class="text-muted mb-0">Clear drains, anchor fuel tanks, and elevate key utilities (pumps, meters) where possible.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4 reveal">
+          <div class="card h-100 tip-card">
+            <div class="card-body">
+              <div class="tip-icon"><i class="bi bi-clipboard2-check"></i></div>
+              <h5 class="fw-semibold">After the Flood</h5>
+              <p class="text-muted mb-0">Use boiled/bottled water; clean and disinfect surfaces; beware of structural damage and live wires.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4 reveal">
+          <div class="card h-100 tip-card">
+            <div class="card-body">
+              <div class="tip-icon"><i class="bi bi-people"></i></div>
+              <h5 class="fw-semibold">Community</h5>
+              <p class="text-muted mb-0">Check on neighbors, especially elderly/disabled; share verified updates and resources.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+<!-- Chatbot Floating Button + Chat Window -->
+    <div class="chatbot-container" id="chatbot">
+        <!-- Floating Icon -->
+        <button class="chatbot-btn" id="chatbotToggle" aria-label="Open chatbot">
+            <i class="bi bi-robot"></i>
+
+        </button>
+
+        <!-- Chat Window -->
+        <div class="chatbot-window" id="chatWindow">
+            <div class="chatbot-header">
+                <span>DisasterX Assistant</span>
+                <button class="chatbot-close-btn" id="chatClose">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="chatbot-body" id="chatBody">
+                <div class="bot-message">👋 Hi! I’m here to help with disaster info. Ask me anything.</div>
+            </div>
+            <div class="chatbot-footer">
+                <input type="text" id="chatInput" placeholder="Type your message..." />
+                <button id="chatSend"><i class="bi bi-send"></i></button>
+            </div>
+        </div>
+    </div>
+  <!-- ===== FOOTER (unchanged markup) ===== -->
+  <footer class="footer py-5 mt-auto">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-md-4">
+          <h5>About DisasterX</h5>
+          <p>DisasterX is a real-time disaster management dashboard that empowers communities, responders, and
+            authorities with live updates, analytics, and resource tracking during emergencies.</p>
+        </div>
+        <div class="col-md-2">
+          <h5>Quick Links</h5>
+          <ul class="list-unstyled">
+            <li><a href="#">Live HeatMap</a></li>
+            <li><a href="#">Weather Forecast</a></li>
+            <li><a href="#">Resource Tools</a></li>
+            <li><a href="#">Simulation</a></li>
+            <li><a href="#">Community</a></li>
+            <li><a href="#">Earthquake Prediction</a></li>
+            <li><a href="#">Flood Prediction</a></li>
+            <li><a href="#">Cyclone Prediction</a></li>
+          </ul>
+        </div>
+        <div class="col-md-3">
+          <h5>Contact Us</h5>
+          <p>Email: support@disasterx.org</p>
+          <p>Phone: +1 (800) 123-4567</p>
+          <p>Location: Innovation Hub, India</p>
+        </div>
+        <div class="col-md-3">
+          <h5>Follow Us</h5>
+          <div class="social-icons d-flex gap-3">
+            <a href="#"><i class="bi bi-facebook"></i></a>
+            <a href="#"><i class="bi bi-twitter-x"></i></a>
+            <a href="#"><i class="bi bi-instagram"></i></a>
+            <a href="#"><i class="bi bi-linkedin"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="text-center mt-4">
+        <small class="text-muted">&copy; 2025 DisasterX. All rights reserved.</small>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== Inline JS (sidebar toggle, reveal, demo compute) ===== -->
+  <script>
+    // Sidebar toggle
+    (function () {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      const toggleBtn = document.getElementById('toggleSidebar');
+      function closeSidebar() {
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
+      }
+      toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+      });
+      overlay.addEventListener('click', closeSidebar);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSidebar(); });
+    })();
+
+    // Reveal on scroll
+    (function () {
+      const els = document.querySelectorAll('.reveal');
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach((en) => {
+          if (en.isIntersecting) {
+            en.target.classList.add('reveal-visible');
+            obs.unobserve(en.target);
+          }
+        });
+      }, { threshold: 0.2 });
+      els.forEach(el => obs.observe(el));
+    })();
+
+    // Demo risk computation (UI only)
+    (function () {
+      const form = document.getElementById('uiFloodForm');
+      const pctEl = document.getElementById('riskPct');
+      const fillEl = document.getElementById('riskFill');
+      const badge = document.getElementById('riskBadge');
+      const tips = document.getElementById('resultTips');
+
+      function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+      function animateTo(val) {
+        const current = parseInt(pctEl.textContent || '0', 10);
+        const target = Math.round(val);
+        const step = target > current ? 1 : -1;
+        const timer = setInterval(() => {
+          const next = parseInt(pctEl.textContent, 10) + step;
+          pctEl.textContent = next;
+          fillEl.style.setProperty('--p', next + '%');
+          if ((step > 0 && next >= target) || (step < 0 && next <= target)) clearInterval(timer);
+        }, 8);
+      }
+      function updateBadge(val) {
+        badge.className = 'badge mt-2';
+        if (val < 30) { badge.classList.add('bg-success'); badge.textContent = 'Low Risk'; }
+        else if (val < 60) { badge.classList.add('bg-warning'); badge.textContent = 'Moderate Risk'; }
+        else { badge.classList.add('bg-danger'); badge.textContent = 'High Risk'; }
+      }
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const lat = parseFloat(document.getElementById('lat').value);
+        const lon = parseFloat(document.getElementById('lon').value);
+        if (isNaN(lat) || isNaN(lon) || lat < 8 || lat > 37 || lon < 68 || lon > 97) {
+          tips.innerHTML = '<span class="text-danger">Please enter valid India coordinates (Lat 8–37, Lon 68–97).</span>';
+          animateTo(0); updateBadge(0);
+          return;
+        }
+        // Pull inputs (if blank, treat as neutral)
+        const discharge = parseFloat(document.getElementById('discharge').value) || 1500;
+        const water = parseFloat(document.getElementById('water').value) || 2;
+        const elevation = parseFloat(document.getElementById('elevation').value) || 200;
+        const density = parseFloat(document.getElementById('density').value) || 200;
+        const infra = document.getElementById('infra').checked ? 1 : 0;
+        const history = document.getElementById('history').checked ? 1 : 0;
+        const land = (document.getElementById('land').value || 'Forest').toLowerCase();
+        const soil = (document.getElementById('soil').value || 'Loam').toLowerCase();
+
+        // Simple illustrative scoring (NOT your model)
+        let score = 0;
+        score += clamp((discharge - 800) / 4000, 0, 1) * 30;
+        score += clamp((water - 1) / 8, 0, 1) * 20;
+        score += (elevation < 150 ? 15 : (elevation < 500 ? 8 : 0));
+        score += clamp(density / 1200, 0, 1) * 10;
+        score += infra ? 5 : 0;
+        score += history ? 10 : 0;
+        if (land === 'urban' || land === 'water' || land === 'agriculture') score += 5;
+        if (soil === 'clay' || soil === 'silt') score += 5;
+
+        const probability = clamp(score, 1, 95);
+        animateTo(probability);
+        updateBadge(probability);
+
+        tips.innerHTML = `
+          <div><strong>Demo summary</strong> — Based on your inputs (discharge, water level, elevation,
+          density, land/soil, and flags), we computed an illustrative probability.
+          When connected to your Python service, this panel will show the Random Forest result and true probability.</div>`;
+      });
+
+      form.addEventListener('reset', function () {
+        setTimeout(() => {
+          animateTo(0);
+          updateBadge(0);
+          tips.textContent = 'Provide location & context to view a demo probability. In production this will show live model output from your Python service.';
+        }, 0);
+      });
+    })();
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
