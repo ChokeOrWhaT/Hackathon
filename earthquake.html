@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DisasterX · Earthquake Prediction</title>
+
+  <!-- Core CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+
+  <!-- Make popup overlay safe if it exists globally -->
+  <style>.popup-overlay{top:0;left:0;width:100%;height:100%;}</style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <img src="your-logo.png" alt="">
+    </div>
+    <a href="#"><i class="bi bi-map"></i> Live HeatMap / Field</a>
+    <a href="weather.html"><i class="bi bi-cloud-sun"></i> Weather Forecast</a>
+    <a href="incident.html"><i class="bi bi-graph-up"></i> Incident Reporting</a>
+    <a href="#"><i class="bi bi-box"></i> Resource Visualization</a>
+    <a href="family.html"><i class="bi bi-people"></i> Family Identification Tool</a>
+    <a href="simulation.html"><i class="bi bi-play-circle"></i> Simulation</a>
+    <a href="#"><i class="bi bi-chat-dots"></i> Community</a>
+    <a href="Profile.html"><i class="bi bi-phone"></i> User Profile</a>
+    <a class="active" href="#"><i class="bi bi-bricks"></i> Earthquake Prediction</a>
+   
+  </div>
+
+  <!-- Overlay -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Navbar (uses your existing classes/styles) -->
+  <nav class="navbar navbar-expand-lg navbar-light custom-navbar py-3">
+    <div class="container-fluid">
+
+      <!-- Left: Sidebar Toggle + Dashboard -->
+      <div class="d-flex align-items-center">
+        <button class="btn toggle-btn me-2" id="toggleSidebar" aria-label="Toggle sidebar" aria-controls="sidebar" aria-expanded="false">
+          <i class="bi bi-list fs-4"></i>
+        </button>
+        <h1 class="fw-bold mb-0 dashboard-title">DASHBOARD</h1>
+      </div>
+
+      <!-- Center: DisasterX Branding -->
+      <div class="mx-auto text-center">
+        <span class="brand-name">Disaster<span class="brand-highlight">X</span></span>
+      </div>
+
+      <!-- Right: Live Monitoring + Buttons -->
+      <div class="d-flex align-items-center gap-3 ms-auto">
+        <small class="text-muted live-text">Live &middot; Monitoring</small>
+        <a href="login.html" class="btn custom-btn-outline">Log In</a>
+        <a href="signup.html" class="btn custom-btn">Sign Up</a>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="eq-hero position-relative overflow-hidden">
+    <div class="eq-hero-bg"></div>
+    <div class="container position-relative">
+      <div class="row align-items-center">
+        <div class="col-lg-7">
+          <div class="eq-hero-copy reveal">
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <i class="bi bi-activity fs-3 text-danger"></i>
+              <span class="eq-chip">Earthquake Prediction (Experimental)</span>
+            </div>
+            <h1 class="eq-hero-title mb-3">
+              Anticipate seismic risk with<br><span class="brand-accent">Disaster</span>X insights
+            </h1>
+            <p class="eq-hero-sub mb-4">
+              Explore probabilities for your area using recent seismic records and the Gutenberg–Richter model.<br/>
+              Built for responders, planners, and communities.
+            </p>
+            <div class="d-flex flex-wrap gap-3">
+              <a href="#eq-form" class="btn eq-cta">Start Prediction</a>
+              <a href="#how-it-works" class="btn eq-ghost">How it works</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-5 mt-5 mt-lg-0">
+          <div class="eq-stats reveal">
+            <div class="eq-stat">
+              <i class="bi bi-broadcast-pin"></i>
+              <div>
+                <div class="eq-stat-label">Global quakes (24h)</div>
+                <div class="eq-stat-value" data-target="122">0</div>
+              </div>
+            </div>
+            <div class="eq-stat">
+              <i class="bi bi-geo-alt"></i>
+              <div>
+                <div class="eq-stat-label">Recent events near you</div>
+                <div class="eq-stat-value" data-target="8">0</div>
+              </div>
+            </div>
+            <div class="eq-stat">
+              <i class="bi bi-graph-up"></i>
+              <div>
+                <div class="eq-stat-label">Model updates (days)</div>
+                <div class="eq-stat-value" data-target="30">0</div>
+              </div>
+            </div>
+            <small class="text-muted">* Demo numbers for UI preview</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how-it-works" class="eq-section">
+    <div class="container">
+      <div class="text-center mb-5 reveal">
+        <h2 class="section-title"><i class="bi bi-info-circle me-2"></i>How this predictor works</h2>
+        <p class="text-muted mb-0">Your Python model blends recent data and classical seismology assumptions.</p>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-3">
+          <div class="eq-card reveal">
+            <div class="eq-card-icon"><i class="bi bi-cloud-download"></i></div>
+            <h5>Data Ingestion</h5>
+            <p>Fetches recent events via IRIS FDSN and optionally merges your CSV (USGS), filtered by magnitude and radius.</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="eq-card reveal">
+            <div class="eq-card-icon"><i class="bi bi-bullseye"></i></div>
+            <h5>Regional Filtering</h5>
+            <p>Uses a haversine distance to include events within your chosen radius of the target location.</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="eq-card reveal">
+            <div class="eq-card-icon"><i class="bi bi-diagram-3"></i></div>
+            <h5>Model Fit</h5>
+            <p>Fits the Gutenberg–Richter law (a & b values) over cumulative magnitude counts.</p>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="eq-card reveal">
+            <div class="eq-card-icon"><i class="bi bi-percent"></i></div>
+            <h5>Probability</h5>
+            <p>Converts event rates into a Poisson probability for a magnitude threshold over your time window.</p>
+          </div>
+        </div>
+      </div>
+      <div class="eq-note mt-4 reveal">
+        <i class="bi bi-shield-exclamation me-2"></i>
+        <strong>Accuracy note:</strong> Short-term earthquake prediction is inherently uncertain. This tool estimates probabilities based on past seismicity and assumptions—not a guarantee. Always follow local authority guidance.
+      </div>
+    </div>
+  </section>
+
+  <!-- PREDICTION FORM -->
+  <section id="eq-form" class="eq-section pt-0">
+    <div class="container">
+      <div class="eq-form-card reveal">
+        <div class="row g-4 align-items-center">
+          <div class="col-lg-7">
+            <h3 class="mb-2"><i class="bi bi-bricks me-2 text-danger"></i>Preview Probability</h3>
+            <p class="text-muted mb-4">Front-end demo only. We’ll wire this to your Python predictor later.</p>
+
+            <form class="row g-3" onsubmit="event.preventDefault(); previewProbability();">
+              <div class="col-md-4">
+                <label class="form-label">Latitude</label>
+                <input type="number" step="0.0001" class="form-control eq-input" id="lat" placeholder="23.3">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Longitude</label>
+                <input type="number" step="0.0001" class="form-control eq-input" id="lon" placeholder="70.4">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Radius (km)</label>
+                <input type="number" class="form-control eq-input" id="radius" value="500" min="10" max="1500">
+              </div>
+              
+              <div class="col-12 d-flex gap-3 mt-2">
+                <button class="btn eq-cta" type="submit"><i class="bi bi-cpu me-2"></i>Calculate (Demo)</button>
+                <button class="btn eq-ghost" type="button" onclick="resetForm()"><i class="bi bi-arrow-counterclockwise me-2"></i>Reset</button>
+              </div>
+            </form>
+          </div>
+          <div class="col-lg-5">
+            <div class="eq-prob-box text-center p-4 border rounded shadow-sm bg-white">
+                <h5 class="mb-2">Predicted Probability</h5>
+            <div id="probValue" class="fs-2 fw-bold text-danger">0%</div>
+                <small class="text-muted">Fetched directly from the backend</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUICK TIPS -->
+      <div class="eq-tips reveal">
+        <div class="d-flex align-items-center mb-3">
+          <i class="bi bi-lightning-charge-fill me-2 text-warning"></i>
+          <h4 class="mb-0">Quick safety measures during an earthquake</h4>
+        </div>
+        <div class="row g-3">
+          <div class="col-md-6 col-lg-4">
+            <div class="tip-card"><i class="bi bi-house-door"></i><div><h6>Drop, Cover & Hold On</h6><p>Get under a sturdy table or desk and hold on until shaking stops.</p></div></div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="tip-card"><i class="bi bi-door-closed"></i><div><h6>Stay Indoors</h6><p>Move away from windows, shelves, and heavy objects that could fall.</p></div></div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="tip-card"><i class="bi bi-building"></i><div><h6>If Outside</h6><p>Move to an open area away from buildings, trees, streetlights, and power lines.</p></div></div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="tip-card"><i class="bi bi-bag-heart"></i><div><h6>Emergency Kit</h6><p>Keep water, food, flashlight, first-aid, radio, and chargers ready.</p></div></div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="tip-card"><i class="bi bi-telephone-forward"></i><div><h6>Communication Plan</h6><p>Agree on meeting points and emergency contacts with family.</p></div></div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="tip-card"><i class="bi bi-exclamation-triangle"></i><div><h6>After Shocks</h6><p>Expect aftershocks; inspect gas/electrical lines and evacuate if you smell gas.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Chatbot Floating Button + Chat Window -->
+    <div class="chatbot-container" id="chatbot">
+        <!-- Floating Icon -->
+        <button class="chatbot-btn" id="chatbotToggle" aria-label="Open chatbot">
+            <i class="bi bi-robot"></i>
+
+        </button>
+
+        <!-- Chat Window -->
+        <div class="chatbot-window" id="chatWindow">
+            <div class="chatbot-header">
+                <span>DisasterX Assistant</span>
+                <button class="chatbot-close-btn" id="chatClose">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="chatbot-body" id="chatBody">
+                <div class="bot-message">👋 Hi! I’m here to help with disaster info. Ask me anything.</div>
+            </div>
+            <div class="chatbot-footer">
+                <input type="text" id="chatInput" placeholder="Type your message..." />
+                <button id="chatSend"><i class="bi bi-send"></i></button>
+            </div>
+        </div>
+    </div>
+
+  <!-- Footer (your provided markup) -->
+  <footer class="footer py-5 mt-auto">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-md-4">
+          <h5>About DisasterX</h5>
+          <p>DisasterX is a real-time disaster management dashboard that empowers communities, responders, and
+            authorities with live updates, analytics, and resource tracking during emergencies.</p>
+        </div>
+        <div class="col-md-2">
+          <h5>Quick Links</h5>
+          <ul class="list-unstyled">
+            <li><a href="#">Live HeatMap</a></li>
+            <li><a href="#">Weather Forecast</a></li>
+            <li><a href="#">Resource Tools</a></li>
+            <li><a href="#">Simulation</a></li>
+            <li><a href="#">Community</a></li>
+            <li><a href="#">Earthquake Prediction</a></li>
+            <li><a href="#">Flood Prediction</a></li>
+            <li><a href="#">Cyclone Prediction</a></li>
+          </ul>
+        </div>
+        <div class="col-md-3">
+          <h5>Contact Us</h5>
+          <p>Email: support@disasterx.org</p>
+          <p>Phone: +1 (800) 123-4567</p>
+          <p>Location: Innovation Hub, India</p>
+        </div>
+        <div class="col-md-3">
+          <h5>Follow Us</h5>
+          <div class="social-icons d-flex gap-3">
+            <a href="#"><i class="bi bi-facebook"></i></a>
+            <a href="#"><i class="bi bi-twitter-x"></i></a>
+            <a href="#"><i class="bi bi-instagram"></i></a>
+            <a href="#"><i class="bi bi-linkedin"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="text-center mt-4">
+        <small class="text-muted">&copy; 2025 DisasterX. All rights reserved.</small>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS (bundle) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Inline JS: sidebar toggle, animations, demo probability -->
+  <script>
+    // Sidebar toggle
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const toggleBtn = document.getElementById('toggleSidebar');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+      overlay.classList.toggle('active');
+    });
+    overlay.addEventListener('click', () => {
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
+    });
+
+    // Reveal on scroll
+    const revealEls = document.querySelectorAll('.reveal, .eq-card, .tip-card, .eq-form-card');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('reveal-in');
+          io.unobserve(e.target);
+        }
+      })
+    }, { threshold: 0.15 });
+    revealEls.forEach(el => io.observe(el));
+
+    // Animate hero counters
+    const counters = document.querySelectorAll('.eq-stat-value');
+    const counterIO = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          animateCounter(el);
+          obs.unobserve(el);
+        }
+      });
+    }, { threshold: 0.6 });
+    counters.forEach(c => counterIO.observe(c));
+
+    function animateCounter(el) {
+      const target = +el.getAttribute('data-target');
+      const duration = 1200;
+      let start = null;
+      function step(ts) {
+        if (!start) start = ts;
+        const p = Math.min((ts - start) / duration, 1);
+        el.textContent = Math.floor(p * target).toLocaleString();
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    // Smooth scroll for hero buttons
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', (e) => {
+        const id = a.getAttribute('href');
+        if (id && id !== '#') {
+          e.preventDefault();
+          document.querySelector(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      })
+    });
+
+
+      async function previewProbability() {
+    const lat = parseFloat(document.getElementById('lat').value);
+    const lon = parseFloat(document.getElementById('lon').value);
+    const radius = parseFloat(document.getElementById('radius').value);
+    const magnitude = 5.5;          // You can make this dynamic if needed
+    const timeWindow = 30;           // You can make this dynamic if needed
+
+    if (!lat || !lon || !radius) {
+        alert('Please fill in all fields.');
+        return;
+    }
+
+    try {
+        const response = await fetch("http://127.0.0.1:8000/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ lat, lon, radius, magnitude, timeWindow })
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.probability !== undefined) {
+            const valueBox = document.getElementById('probValue');
+            valueBox.textContent = parseFloat(result.probability).toFixed(2) + '%';
+        } else {
+            alert("Prediction failed: " + (result.error || "Unknown error"));
+        }
+    } catch (err) {
+        console.error("Error:", err);
+        alert("Server not reachable. Is Flask running?");
+    }
+}
+
+    function resetForm() {
+        ['lat', 'lon'].forEach(id => { document.getElementById(id).value = ''; });
+        document.getElementById('radius').value = 500;
+        document.getElementById('probValue').textContent = '0%';
+}
+
+</script>
+</body>
+</html>
